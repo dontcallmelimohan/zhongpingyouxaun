@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>个人中心 - 众评优选</title>
+<link href="../libs/bootstrap/5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="../libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+<link href="/css/style.css" rel="stylesheet"/>
+</link></head>
+<body>
+<header>
+<nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+<div class="container">
+<a class="navbar-brand fw-bold" href="/index.html">
+<i class="fa-solid fa-star-half-stroke"></i>
+                    众评优选
+                </a>
+<button aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-bs-target="#navbarNav" data-bs-toggle="collapse" type="button">
+<span class="navbar-toggler-icon"></span>
+</button>
+<div class="collapse navbar-collapse" id="navbarNav">
+<div class="d-none d-lg-flex flex-grow-1 mx-4">
+<ul class="navbar-nav me-auto">
+<li class="nav-item dropdown">
+<a aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" id="categoryDropdown" role="button">
+<i class="fa-solid fa-th-large"></i> 全部分类
+                                </a>
+<ul aria-labelledby="categoryDropdown" class="dropdown-menu">
+<li><a class="dropdown-item" href="/product/list.html?categoryId=1">电子产品</a></li>
+<li><a class="dropdown-item" href="/product/list.html?categoryId=2">家居生活</a></li>
+<li><a class="dropdown-item" href="/product/list.html?categoryId=3">美妆个护</a></li>
+<li><a class="dropdown-item" href="/product/list.html?categoryId=4">食品饮料</a></li>
+<li><a class="dropdown-item" href="/product/list.html?categoryId=5">服饰鞋包</a></li>
+</ul>
+</li>
+<li class="nav-item"><a class="nav-link" href="/product/list.html?sort=createdAt,desc">最新上架</a></li>
+<li class="nav-item"><a class="nav-link" href="/product/list.html?sort=reviewCount,desc">评价最多</a></li>
+<li class="nav-item"><a class="nav-link" href="/product/list.html?sort=averageRating,desc">评分最高</a></li>
+</ul>
+</div>
+<form class="d-flex mx-auto my-2 my-lg-0" id="search-form">
+<input aria-label="Search" class="form-control me-2" placeholder="搜索商品、评价..." style="width: 300px;" type="search"/>
+<button class="btn btn-outline-primary" type="submit">
+<i class="fa-solid fa-magnifying-glass"></i>
+</button>
+</form>
+<ul class="navbar-nav ms-auto" id="auth-links">
+<li class="nav-item" id="login-link">
+<a class="btn btn-outline-primary me-2" href="/user/login.html">登录</a>
+</li>
+<li class="nav-item" id="register-link">
+<a class="btn btn-primary" href="/user/register.html">注册</a>
+</li>
+<li class="nav-item dropdown d-none" id="user-profile-link">
+<a aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" id="navbarDropdown" role="button">
+<i class="fa-solid fa-user"></i> 个人中心
+                            </a>
+<ul aria-labelledby="navbarDropdown" class="dropdown-menu">
+<li><a class="dropdown-item" href="/user/profile.html">我的信息</a></li>
+<li><a class="dropdown-item" href="/user/favorites.html">我的收藏</a></li>
+<li><hr class="dropdown-divider"/></li>
+<li><a class="dropdown-item d-none" href="/admin/index.html" id="admin-dashboard-link">管理员后台</a></li>
+<li><a class="dropdown-item d-none" href="/merchant/dashboard.html" id="merchant-dashboard-link">商家后台</a></li>
+<li><hr class="dropdown-divider"/></li>
+<li><button class="dropdown-item" id="logout-button">退出登录</button></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</nav>
+</header>
+<main class="container my-5">
+<h1 class="mb-4">个人中心</h1>
+<div class="row">
+<div class="col-md-4">
+<div class="card">
+<div class="card-header">
+<h4>我的信息</h4>
+</div>
+<div class="card-body">
+<p><strong>用户名:</strong> <span id="profile-username">加载中...</span></p>
+<p><strong>邮箱:</strong> <span id="profile-email">加载中...</span></p>
+<p><strong>角色:</strong> <span id="profile-roles">加载中...</span></p>
+<button class="btn btn-primary mt-3" data-bs-target="#editProfileModal" data-bs-toggle="modal" id="edit-profile-btn">
+<i class="fa-solid fa-pen-to-square"></i> 编辑信息
+                        </button>
+</div>
+</div>
+</div>
+<div class="col-md-8">
+<div class="card mb-4">
+<div class="card-header">
+<h4>我发布的评价</h4>
+</div>
+<div class="card-body">
+<div class="list-group" id="my-reviews-container">
+<p class="text-muted">正在加载您的评价...</p>
+</div>
+</div>
+</div>
+<div class="card mb-4">
+<div class="card-header">
+<h4>我的回复</h4>
+</div>
+<div class="card-body">
+<div class="list-group" id="my-replies-container">
+<p class="text-muted">正在加载您的回复...</p>
+</div>
+</div>
+</div>
+<div class="card">
+<div class="card-header">
+<h4>回复我的</h4>
+</div>
+<div class="card-body">
+<div class="list-group" id="replies-to-me-container">
+<p class="text-muted">正在加载回复您的内容...</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div aria-hidden="true" aria-labelledby="editProfileModalLabel" class="modal fade" id="editProfileModal" tabindex="-1">
+<div class="modal-dialog">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title" id="editProfileModalLabel">编辑个人信息</h5>
+<button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+</div>
+<div class="modal-body">
+<form id="edit-profile-form">
+<div class="mb-3">
+<label class="form-label" for="edit-username">用户名</label>
+<input class="form-control" id="edit-username" required="" type="text"/>
+</div>
+<div class="mb-3">
+<label class="form-label" for="edit-email">邮箱</label>
+<input class="form-control" id="edit-email" required="" type="email"/>
+</div>
+<div class="mb-3">
+<label class="form-label" for="edit-password">密码 (留空不修改)</label>
+<input class="form-control" id="edit-password" type="password"/>
+</div>
+</form>
+</div>
+<div class="modal-footer">
+<button class="btn btn-secondary" data-bs-dismiss="modal" type="button">取消</button>
+<button class="btn btn-primary" id="save-profile-btn" type="button">保存修改</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+
+<script src="../libs/bootstrap/5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/main.js"></script>
+<script>
+        async function loadCategories() {
+            try {
+                const response = await fetch('http://localhost:8080/api/categories');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const categories = await response.json();
+
+                const categoryDropdown = document.querySelector('#categoryDropdown + .dropdown-menu');
+                if (categoryDropdown && categories.length > 0) {
+                    categoryDropdown.innerHTML = '';
+                    
+                    categories.forEach(category => {
+                        const listItem = document.createElement('li');
+                        listItem.innerHTML = `
+                            <a class="dropdown-item" href="/product/list.html?categoryId=${category.id}">
+                                ${category.name}
+                            </a>
+                        `;
+                        categoryDropdown.appendChild(listItem);
+                    });
+                }
+            } catch (error) {
+                console.error('加载分类数据失败:', error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadCategories);
+    </script>
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchForm = document.getElementById('search-form');
+            if (searchForm) {
+                searchForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const searchInput = searchForm.querySelector('input');
+                    const searchQuery = searchInput.value.trim();
+                    if (searchQuery) {
+                        window.location.href = `/product/list.html?searchQuery=${encodeURIComponent(searchQuery)}`;
+                    }
+                });
+            }
+        });
+    </script>
+<script src="/js/interaction.js"></script>
+<script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const token = localStorage.getItem('jwtToken');
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const headers = { 'Authorization': `Bearer ${token}` };
+
+            try {
+                const profileResponse = await fetch('/api/user/profile', { headers });
+                if (!profileResponse.ok) throw new Error('Failed to fetch profile');
+                const profile = await profileResponse.json();
+                
+                document.getElementById('profile-username').textContent = profile.username;
+                document.getElementById('profile-email').textContent = profile.email;
+                document.getElementById('profile-roles').textContent = profile.roles.join(', ').replace(/ROLE_/g, '');
+
+                window.currentUserProfile = profile;
+            } catch (error) {
+                console.error('Error fetching profile:', error);
+                localStorage.clear();
+                window.location.href = 'login.html';
+            }
+
+            const editProfileBtn = document.getElementById('edit-profile-btn');
+            const editProfileModal = document.getElementById('editProfileModal');
+            const editUsernameInput = document.getElementById('edit-username');
+            const editEmailInput = document.getElementById('edit-email');
+            const editPasswordInput = document.getElementById('edit-password');
+            const saveProfileBtn = document.getElementById('save-profile-btn');
+            
+            if (editProfileBtn) {
+                editProfileBtn.addEventListener('click', () => {
+                    if (window.currentUserProfile) {
+                        editUsernameInput.value = window.currentUserProfile.username;
+                        editEmailInput.value = window.currentUserProfile.email;
+                        editPasswordInput.value = '';
+                    }
+                });
+            }
+            
+            if (saveProfileBtn) {
+                saveProfileBtn.addEventListener('click', async () => {
+                    const updatedProfile = {
+                        username: editUsernameInput.value.trim(),
+                        email: editEmailInput.value.trim()
+                    };
+
+                    if (editPasswordInput.value.trim()) {
+                        updatedProfile.password = editPasswordInput.value;
+                    }
+                    
+                    try {
+                        const response = await fetch('/api/user/profile', {
+                            method: 'PUT',
+                            headers: {
+                                ...headers,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(updatedProfile)
+                        });
+                        
+                        if (response.ok) {
+                            const updatedData = await response.json();
+                            document.getElementById('profile-username').textContent = updatedData.username;
+                            document.getElementById('profile-email').textContent = updatedData.email;
+
+                            window.currentUserProfile = updatedData;
+
+                            alert('个人信息更新成功！');
+
+                            const modal = bootstrap.Modal.getInstance(editProfileModal);
+                            modal.hide();
+                        } else {
+                            const errorData = await response.json();
+                            throw new Error(errorData.message || '更新失败');
+                        }
+                    } catch (error) {
+                        console.error('Error updating profile:', error);
+                        alert(`更新失败: ${error.message}`);
+                    }
+                });
+            }
+
+            const reviewsContainer = document.getElementById('my-reviews-container');
+            const reviewsPageSize = 5;
+            let reviewsCurrentPage = 0;
+            let reviewsTotalPages = 1;
+
+            const reviewsPaginationContainer = document.createElement('div');
+            reviewsPaginationContainer.className = 'mt-4 d-flex justify-content-center';
+            reviewsPaginationContainer.id = 'reviews-pagination';
+
+            reviewsContainer.parentNode.appendChild(reviewsPaginationContainer);
+
+            async function loadMyReviews(page = 0) {
+                try {
+                    const reviewsResponse = await fetch(`/api/reviews/my-reviews?page=${page}&size=${reviewsPageSize}`, { headers });
+                    if (!reviewsResponse.ok) throw new Error('Failed to fetch reviews');
+                    const reviewsPage = await reviewsResponse.json();
+                    
+                    if (reviewsPage.content && reviewsPage.content.length > 0) {
+                        reviewsContainer.innerHTML = '';
+                        reviewsPage.content.forEach(review => {
+                            reviewsContainer.innerHTML += `
+                                <a href="/product/detail.html?id=${review.productId}" class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1">${review.title}</h5>
+                                        <small class="text-muted">${new Date(review.createdAt).toLocaleDateString()}</small>
+                                    </div>
+                                    <p class="mb-1">${review.content.substring(0,150)}...</p>
+                                </a>
+                            `;
+                        });
+
+                        reviewsTotalPages = reviewsPage.totalPages || 1;
+                        reviewsCurrentPage = page;
+
+                        updateReviewsPagination();
+                    } else {
+                        reviewsContainer.innerHTML = '<p class="text-muted">您还没有发布任何评价。</p>';
+                        reviewsPaginationContainer.innerHTML = '';
+                    }
+                } catch (error) {
+                     console.error('Error fetching reviews:', error);
+                     reviewsContainer.innerHTML = '<p class="text-danger">加载评价失败。</p>';
+                }
+            }
+
+            function updateReviewsPagination() {
+                reviewsPaginationContainer.innerHTML = `
+                    <nav aria-label="我的评价分页">
+                        <ul class="pagination">
+                            <li class="page-item ${reviewsCurrentPage === 0 ? 'disabled' : ''}">
+                                <a class="page-link" href="#" id="reviews-prev-page">上一页</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link">第 ${reviewsCurrentPage + 1} / ${reviewsTotalPages} 页</a>
+                            </li>
+                            <li class="page-item ${reviewsCurrentPage >= reviewsTotalPages - 1 ? 'disabled' : ''}">
+                                <a class="page-link" href="#" id="reviews-next-page">下一页</a>
+                            </li>
+                        </ul>
+                    </nav>
+                `;
+
+                document.getElementById('reviews-prev-page').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (reviewsCurrentPage > 0) {
+                        loadMyReviews(reviewsCurrentPage - 1);
+                    }
+                });
+                
+                document.getElementById('reviews-next-page').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (reviewsCurrentPage < reviewsTotalPages - 1) {
+                        loadMyReviews(reviewsCurrentPage + 1);
+                    }
+                });
+            }
+
+            loadMyReviews();
+
+            const myRepliesContainer = document.getElementById('my-replies-container');
+            const myRepliesPageSize = 5;
+            let myRepliesCurrentPage = 0;
+            let myRepliesTotalPages = 1;
+
+            const myRepliesPaginationContainer = document.createElement('div');
+            myRepliesPaginationContainer.className = 'mt-4 d-flex justify-content-center';
+            myRepliesPaginationContainer.id = 'my-replies-pagination';
+
+            myRepliesContainer.parentNode.appendChild(myRepliesPaginationContainer);
+
+            async function loadUserReplies(page = 0) {
+                try {
+                    myRepliesContainer.innerHTML = '<p class="text-muted">正在加载您的回复...</p>';
+
+                    console.log('调用API: /api/user/reviews/replies');
+                    const repliesResponse = await fetch(`/api/user/reviews/replies?page=${page}&size=${myRepliesPageSize}`, {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('jwtToken')}`
+                        }
+                    });
+
+                    if (repliesResponse.ok) {
+                        const repliesData = await repliesResponse.json();
+                        console.log('我的回复API响应:', repliesData);
+                        console.log('我的回复数据类型:', Array.isArray(repliesData) ? 'Array' : typeof repliesData);
+                        console.log('我的回复数据长度:', Array.isArray(repliesData) ? repliesData.length : 'Not Array');
+
+                        const repliesArray = Array.isArray(repliesData) ? repliesData : [];
+
+                        if (repliesArray.length > 0) {
+                            myRepliesContainer.innerHTML = '';
+                            
+                            repliesArray.forEach(reply => {
+                                const content = reply.content || '无内容';
+                                const createdAt = reply.createdAt || new Date().toISOString();
+                                const productId = reply.reviewProductId || 0;
+                                const productName = reply.reviewTitle || '未知商品';
+                                  
+                                myRepliesContainer.innerHTML += `
+                                    <div class="list-group-item">
+                                        <p class="mb-1">回复了评价: <a href="/product/detail.html?id=${productId}" class="text-primary">${productName}</a></p>
+                                        <p class="mb-1">${content}</p>
+                                        <small class="text-muted">发布于 ${new Date(createdAt).toLocaleString()}</small>
+                                    </div>
+                                `;
+                            });
+
+                            const totalCountResponse = await fetch('/api/user/replies?size=1000', {
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${localStorage.getItem('jwtToken')}`
+                                }
+                            });
+                            
+                            let totalCount = repliesArray.length;
+                            if (totalCountResponse.ok) {
+                                const totalData = await totalCountResponse.json();
+                                if (totalData && totalData.content) {
+                                    totalCount = totalData.totalElements || totalData.content.length;
+                                } else if (Array.isArray(totalData)) {
+                                    totalCount = totalData.length;
+                                }
+                            }
+
+                            myRepliesTotalPages = Math.ceil(totalCount / myRepliesPageSize) || 1;
+                            myRepliesCurrentPage = page;
+
+                            updateMyRepliesPagination();
+                        } else {
+                            myRepliesContainer.innerHTML = '<p class="text-muted">您还没有发布任何回复。</p>';
+                            myRepliesPaginationContainer.innerHTML = '';
+                        }
+                    } else {
+                        console.error('API调用失败:', repliesResponse.status);
+                        myRepliesContainer.innerHTML = `<p class="text-danger">加载回复失败: 网络错误</p>`;
+                    }
+                } catch (error) {
+                    console.error('Error loading user replies:', error);
+                    myRepliesContainer.innerHTML = `<p class="text-danger">加载回复失败: ${error.message}</p>`;
+                }
+            }
+
+            function updateMyRepliesPagination() {
+                myRepliesPaginationContainer.innerHTML = `
+                    <nav aria-label="我的回复分页">
+                        <ul class="pagination">
+                            <li class="page-item ${myRepliesCurrentPage === 0 ? 'disabled' : ''}">
+                                <a class="page-link" href="#" id="my-replies-prev-page">上一页</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link">第 ${myRepliesCurrentPage + 1} / ${myRepliesTotalPages} 页</a>
+                            </li>
+                            <li class="page-item ${myRepliesCurrentPage >= myRepliesTotalPages - 1 ? 'disabled' : ''}">
+                                <a class="page-link" href="#" id="my-replies-next-page">下一页</a>
+                            </li>
+                        </ul>
+                    </nav>
+                `;
+
+                document.getElementById('my-replies-prev-page').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (myRepliesCurrentPage > 0) {
+                        loadUserReplies(myRepliesCurrentPage - 1);
+                    }
+                });
+                
+                document.getElementById('my-replies-next-page').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (myRepliesCurrentPage < myRepliesTotalPages - 1) {
+                        loadUserReplies(myRepliesCurrentPage + 1);
+                    }
+                });
+            }
+
+            loadUserReplies();
+
+            const repliesToMeContainer = document.getElementById('replies-to-me-container');
+            const repliesToMePageSize = 5;
+            let repliesToMeCurrentPage = 0;
+            let repliesToMeTotalPages = 1;
+
+            const repliesToMePaginationContainer = document.createElement('div');
+            repliesToMePaginationContainer.className = 'mt-4 d-flex justify-content-center';
+            repliesToMePaginationContainer.id = 'replies-to-me-pagination';
+
+            repliesToMeContainer.parentNode.appendChild(repliesToMePaginationContainer);
+
+            async function loadRepliesToMe(page = 0) {
+                try {
+                    repliesToMeContainer.innerHTML = '<p class="text-muted">正在加载回复...</p>';
+
+                    console.log('调用API: /api/user/reviews/replies-to-me');
+                    const repliesResponse = await fetch(`/api/user/reviews/replies-to-me?page=${page}&size=${repliesToMePageSize}`, {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('jwtToken')}`
+                        }
+                    });
+
+                    if (repliesResponse.ok) {
+                        const repliesToMeData = await repliesResponse.json();
+                        console.log('回复我的API响应:', repliesToMeData);
+                        console.log('回复我的数据类型:', Array.isArray(repliesToMeData) ? 'Array' : typeof repliesToMeData);
+                        console.log('回复我的数据长度:', Array.isArray(repliesToMeData) ? repliesToMeData.length : 'Not Array');
+
+                        const repliesToMeArray = Array.isArray(repliesToMeData) ? repliesToMeData : [];
+
+                        if (repliesToMeArray.length > 0) {
+                            repliesToMeContainer.innerHTML = '';
+                            
+                            repliesToMeArray.forEach(reply => {
+                                const replierUsername = reply.replierUsername || '未知用户';
+                                const content = reply.content || '无内容';
+                                const createdAt = reply.createdAt || new Date().toISOString();
+                                const reviewProductId = reply.reviewProductId || 0;
+                                  
+                                repliesToMeContainer.innerHTML += `
+                                    <div class="list-group-item">
+                                        <p class="mb-1"><span class="text-primary">${replierUsername}</span> 回复了您的评价</p>
+                                        <p class="mb-1">${content}</p>
+                                        <small class="text-muted">发布于 ${new Date(createdAt).toLocaleString()}</small>
+                                        <a href="/product/detail.html?id=${reviewProductId}" class="text-primary">查看完整评价</a>
+                                    </div>
+                                `;
+                            });
+
+                            const totalCountResponse = await fetch('/api/user/replies/received?size=1000', {
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${localStorage.getItem('jwtToken')}`
+                                }
+                            });
+                            
+                            let totalCount = repliesToMeArray.length;
+                            if (totalCountResponse.ok) {
+                                const totalData = await totalCountResponse.json();
+                                if (totalData && totalData.content) {
+                                    totalCount = totalData.totalElements || totalData.content.length;
+                                } else if (Array.isArray(totalData)) {
+                                    totalCount = totalData.length;
+                                }
+                            }
+
+                            repliesToMeTotalPages = Math.ceil(totalCount / repliesToMePageSize) || 1;
+                            repliesToMeCurrentPage = page;
+
+                            updateRepliesToMePagination();
+                        } else {
+                            repliesToMeContainer.innerHTML = '<p class="text-muted">暂无回复。</p>';
+                            repliesToMePaginationContainer.innerHTML = '';
+                        }
+                    } else {
+                        console.error('API调用失败:', repliesResponse.status);
+                        repliesToMeContainer.innerHTML = `<p class="text-danger">加载回复失败: 网络错误</p>`;
+                    }
+                } catch (error) {
+                    console.error('Error loading replies to me:', error);
+                    repliesToMeContainer.innerHTML = `<p class="text-danger">加载回复失败: ${error.message}</p>`;
+                }
+            }
+
+            function updateRepliesToMePagination() {
+                repliesToMePaginationContainer.innerHTML = `
+                    <nav aria-label="回复我的分页">
+                        <ul class="pagination">
+                            <li class="page-item ${repliesToMeCurrentPage === 0 ? 'disabled' : ''}">
+                                <a class="page-link" href="#" id="replies-to-me-prev-page">上一页</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link">第 ${repliesToMeCurrentPage + 1} / ${repliesToMeTotalPages} 页</a>
+                            </li>
+                            <li class="page-item ${repliesToMeCurrentPage >= repliesToMeTotalPages - 1 ? 'disabled' : ''}">
+                                <a class="page-link" href="#" id="replies-to-me-next-page">下一页</a>
+                            </li>
+                        </ul>
+                    </nav>
+                `;
+
+                document.getElementById('replies-to-me-prev-page').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (repliesToMeCurrentPage > 0) {
+                        loadRepliesToMe(repliesToMeCurrentPage - 1);
+                    }
+                });
+                
+                document.getElementById('replies-to-me-next-page').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (repliesToMeCurrentPage < repliesToMeTotalPages - 1) {
+                        loadRepliesToMe(repliesToMeCurrentPage + 1);
+                    }
+                });
+            }
+
+            loadRepliesToMe();
+        });
+    </script>
+</body>
+</html>

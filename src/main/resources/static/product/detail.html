@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>商品详情 - 众评优选</title>
+<link href="../libs/bootstrap/5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="../libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+<link href="/css/style.css" rel="stylesheet"/>
+</link></head>
+<body>
+<header>
+<nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+<div class="container">
+<a class="navbar-brand fw-bold" href="/index.html">
+<i class="fa-solid fa-star-half-stroke"></i>
+                    众评优选
+                </a>
+<button aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-bs-target="#navbarNav" data-bs-toggle="collapse" type="button">
+<span class="navbar-toggler-icon"></span>
+</button>
+<div class="collapse navbar-collapse" id="navbarNav">
+<div class="d-none d-lg-flex flex-grow-1 mx-4">
+<ul class="navbar-nav me-auto">
+<li class="nav-item dropdown">
+<a aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" id="categoryDropdown" role="button">
+<i class="fa-solid fa-th-large"></i> 全部分类
+                                </a>
+<ul aria-labelledby="categoryDropdown" class="dropdown-menu">
+<li><a class="dropdown-item" href="/product/list.html?categoryId=1">电子产品</a></li>
+<li><a class="dropdown-item" href="/product/list.html?categoryId=2">家居生活</a></li>
+<li><a class="dropdown-item" href="/product/list.html?categoryId=3">美妆个护</a></li>
+<li><a class="dropdown-item" href="/product/list.html?categoryId=4">食品饮料</a></li>
+<li><a class="dropdown-item" href="/product/list.html?categoryId=5">服饰鞋包</a></li>
+</ul>
+</li>
+<li class="nav-item"><a class="nav-link" href="/product/list.html?sort=createdAt,desc">最新上架</a></li>
+<li class="nav-item"><a class="nav-link" href="/product/list.html?sort=reviewCount,desc">评价最多</a></li>
+<li class="nav-item"><a class="nav-link" href="/product/list.html?sort=averageRating,desc">评分最高</a></li>
+</ul>
+</div>
+<form class="d-flex mx-auto my-2 my-lg-0" id="search-form">
+<input aria-label="Search" class="form-control me-2" placeholder="搜索商品、评价..." style="width: 300px;" type="search"/>
+<button class="btn btn-outline-primary" type="submit">
+<i class="fa-solid fa-magnifying-glass"></i>
+</button>
+</form>
+<ul class="navbar-nav ms-auto" id="auth-links">
+<li class="nav-item" id="login-link">
+<a class="btn btn-outline-primary me-2" href="/user/login.html">登录</a>
+</li>
+<li class="nav-item" id="register-link">
+<a class="btn btn-primary" href="/user/register.html">注册</a>
+</li>
+<li class="nav-item dropdown d-none" id="user-profile-link">
+<a aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" id="navbarDropdown" role="button">
+<i class="fa-solid fa-user"></i> 个人中心
+                            </a>
+<ul aria-labelledby="navbarDropdown" class="dropdown-menu">
+<li><a class="dropdown-item" href="/user/profile.html">我的信息</a></li>
+<li><a class="dropdown-item" href="/user/favorites.html">我的收藏</a></li>
+<li><hr class="dropdown-divider"/></li>
+<li><a class="dropdown-item d-none" href="/admin/index.html" id="admin-dashboard-link">管理员后台</a></li>
+<li><a class="dropdown-item d-none" href="/merchant/dashboard.html" id="merchant-dashboard-link">商家后台</a></li>
+<li><hr class="dropdown-divider"/></li>
+<li><button class="dropdown-item" id="logout-button">退出登录</button></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</nav>
+</header>
+<main class="container my-5">
+<section id="product-details-section">
+<div class="row">
+<div class="col-md-6">
+<img alt="Product Image" class="img-fluid rounded" id="product-image" src="https://via.placeholder.com/600x400.png?text=Loading..."/>
+</div>
+<div class="col-md-6">
+<h1 id="product-name">加载中...</h1>
+<div class="mb-3">
+<span class="rating-stars" id="product-rating-stars"></span>
+<span class="text-muted ms-2" id="product-rating-text"></span>
+</div>
+<p><strong>分类:</strong> <span id="product-category">--</span></p>
+<p><strong>商家:</strong> <span id="product-merchant">--</span></p>
+<p class="lead" id="product-description">...</p>
+<div class="mt-4">
+<button class="btn btn-outline-danger btn-sm me-3" id="product-like-btn">
+<i class="far fa-thumbs-up"></i> <span id="product-like-count">0</span> 点赞
+                        </button>
+<button class="btn btn-outline-danger btn-sm" id="product-favorite-btn">
+<i class="far fa-heart"></i> 收藏
+                        </button>
+</div>
+</div>
+</div>
+</section>
+<hr class="my-5"/>
+<section id="reviews-section">
+<h2>用户评价</h2>
+<div class="card my-4 d-none" id="add-review-form-container">
+<div class="card-body">
+<h5 class="card-title">发表您的评价</h5>
+<form id="add-review-form">
+<div class="mb-3">
+<label class="form-label" for="review-rating">评分</label>
+<select class="form-select" id="review-rating" required="">
+<option value="">选择评分</option>
+<option value="5">5 星 - 非常棒</option>
+<option value="4">4 星 - 很好</option>
+<option value="3">3 星 - 一般</option>
+<option value="2">2 星 - 不太好</option>
+<option value="1">1 星 - 很差</option>
+</select>
+</div>
+<div class="mb-3">
+<label class="form-label" for="review-title">标题</label>
+<input class="form-control" id="review-title" required="" type="text"/>
+</div>
+<div class="mb-3">
+<label class="form-label" for="review-content">内容</label>
+<textarea class="form-control" id="review-content" required="" rows="4"></textarea>
+</div>
+<button class="btn btn-primary" type="submit">提交评价</button>
+</form>
+</div>
+</div>
+<div class="list-group" id="reviews-container">
+<p>正在加载评价...</p>
+</div>
+</section>
+</main>
+
+<script src="../libs/bootstrap/5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/placeholder-utils.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/interaction.js"></script>
+<script>
+        async function loadCategories() {
+            try {
+                const response = await fetch('http://localhost:8080/api/categories');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const categories = await response.json();
+
+                const categoryDropdown = document.querySelector('#categoryDropdown + .dropdown-menu');
+                if (categoryDropdown && categories.length > 0) {
+                    categoryDropdown.innerHTML = '';
+                    
+                    categories.forEach(category => {
+                        const listItem = document.createElement('li');
+                        listItem.innerHTML = `
+                            <a class="dropdown-item" href="/product/list.html?categoryId=${category.id}">
+                                ${category.name}
+                            </a>
+                        `;
+                        categoryDropdown.appendChild(listItem);
+                    });
+                }
+            } catch (error) {
+                console.error('加载分类数据失败:', error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadCategories);
+    </script>
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchForm = document.getElementById('search-form');
+            if (searchForm) {
+                searchForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const searchInput = searchForm.querySelector('input');
+                    const searchQuery = searchInput.value.trim();
+                    if (searchQuery) {
+                        window.location.href = `/product/list.html?searchQuery=${encodeURIComponent(searchQuery)}`;
+                    }
+                });
+            }
+        });
+    </script>
+<script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const productId = urlParams.get('id');
+            const token = localStorage.getItem('jwtToken');
+
+            if (!productId) {
+                document.querySelector('main').innerHTML = '<h1>未找到商品</h1><p>请提供有效的商品ID。</p>';
+                return;
+            }
+
+
+            try {
+                const response = await fetch(`/api/products/${productId}`);
+                if (!response.ok) throw new Error('Product not found');
+                const product = await response.json();
+                
+                document.title = `${product.name} - 众评优选`;
+                document.getElementById('product-name').textContent = product.name;
+                document.getElementById('product-image').alt = product.name;
+                document.getElementById('product-image').src = product.imageUrls || (window.placeholderGenerator ? window.placeholderGenerator.generateProductPlaceholder(600, 400, product.name) : 'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22600%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20fill%3D%22%23165DFF%22%2F%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20font-family%3D%22Arial%2C%20sans-serif%22%20font-size%3D%2224%22%20fill%3D%22%23FFFFFF%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22middle%22%3E商品图片%3C%2Ftext%3E%3C%2Fsvg%3E');
+                document.getElementById('product-rating-stars').innerHTML = renderStars(product.averageRating);
+                document.getElementById('product-rating-text').textContent = `${product.averageRating.toFixed(1)}分 (${product.reviewCount}条评价)`;
+                document.getElementById('product-category').textContent = product.categoryName;
+                document.getElementById('product-merchant').textContent = product.merchantName;
+                document.getElementById('product-description').textContent = product.description;
+                document.getElementById('product-like-count').textContent = product.likesCount || 0;
+                
+            } catch (error) {
+                console.error(error);
+                document.querySelector('main').innerHTML = '<h1>商品加载失败</h1>';
+            }
+
+
+            const reviewsContainer = document.getElementById('reviews-container');
+            let currentPage = 0;
+            const pageSize = 5;
+            let totalPages = 1;
+            let hasMoreReviews = true;
+
+            const paginationContainer = document.createElement('div');
+            paginationContainer.className = 'mt-4 d-flex justify-content-center';
+            paginationContainer.innerHTML = `
+                <nav aria-label="评论分页">
+                    <ul class="pagination">
+                        <li class="page-item">
+                            <a class="page-link" href="#" id="prev-page">上一页</a>
+                        </li>
+                        <li class="page-item active">
+                            <a class="page-link" href="#" id="page-number">第${currentPage + 1} / ${totalPages} 页</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="#" id="next-page">下一页</a>
+                        </li>
+                    </ul>
+                </nav>
+            `;
+            document.getElementById('reviews-section').appendChild(paginationContainer);
+
+            document.getElementById('prev-page').addEventListener('click', (e) => {
+                e.preventDefault();
+                if (currentPage > 0) {
+                    currentPage--;
+                    loadReviews(currentPage);
+                }
+            });
+            
+            document.getElementById('next-page').addEventListener('click', (e) => {
+                e.preventDefault();
+                if (currentPage < totalPages - 1) {
+                    currentPage++;
+                    loadReviews(currentPage);
+                }
+            });
+
+            function updatePagination() {
+                document.getElementById('page-number').textContent = `第${currentPage + 1} / ${totalPages} 页`;
+                document.getElementById('prev-page').parentElement.classList.toggle('disabled', currentPage === 0);
+                document.getElementById('next-page').parentElement.classList.toggle('disabled', currentPage >= totalPages - 1);
+            }
+            
+            async function loadReviews(page = 0) {
+                try {
+                    console.log(`加载评论，页码: ${page}, 每页数量: ${pageSize}`);
+                    const response = await fetch(`/api/reviews/product/${productId}?page=${page}&size=${pageSize}`);
+                    if (!response.ok) {
+                        console.error(`获取评论失败，状态码: ${response.status}`);
+                        throw new Error('Failed to load reviews');
+                    }
+                    const reviewsPage = await response.json();
+                    
+                    console.log('评论数据:', reviewsPage);
+
+                    window.reviewData = reviewsPage.content || [];
+
+                    currentPage = reviewsPage.number;
+                    totalPages = reviewsPage.totalPages;
+                    console.log(`更新分页信息: 当前页=${currentPage}, 总页数=${totalPages}`);
+                    updatePagination();
+
+                    if(reviewsPage.content && reviewsPage.content.length > 0) {
+                        let reviewsHtml = '';
+
+                        for (const review of reviewsPage.content) {
+                            let isLiked = false;
+                            let comments = [];
+
+                            let isFavorited = false;
+                            if (token) {
+                                try {
+                                    const likeResponse = await fetch(`/api/reviews/${review.id}/is-liked`, {
+                                        headers: {
+                                            'Authorization': `Bearer ${token}`
+                                        }
+                                    });
+                                    
+                                    if (likeResponse.ok) {
+                                        isLiked = await likeResponse.json();
+                                    } else if (likeResponse.status === 401) {
+                                        localStorage.removeItem('jwtToken');
+                                        console.log('登录已过期，请重新登录');
+                                    }
+                                } catch (error) {
+                                    console.error('检查点赞状态失败:', error);
+                                }
+
+                                try {
+                                    const favoriteResponse = await fetch(`/api/reviews/${review.id}/favorite/status`, {
+                                        headers: {
+                                            'Authorization': `Bearer ${token}`
+                                        }
+                                    });
+                                    
+                                    if (favoriteResponse.ok) {
+                                        isFavorited = await favoriteResponse.json();
+                                    } else if (favoriteResponse.status === 401) {
+                                        localStorage.removeItem('jwtToken');
+                                        console.log('登录已过期，请重新登录');
+                                    }
+                                } catch (error) {
+                                    console.error('检查收藏状态失败:', error);
+                                }
+                            }
+
+                            let commentsHtml = '';
+
+                            try {
+                                const commentPageSize = 5;
+                                let commentCurrentPage = 0;
+                                let commentTotalPages = 1;
+                                let commentData = [];
+
+                                const commentsResponse = await fetch(`/api/comments/review/${review.id}?page=${commentCurrentPage}&size=${commentPageSize}`);
+                                if (commentsResponse.ok) {
+                                    const commentsPage = await commentsResponse.json();
+                                    commentData = commentsPage.content || [];
+                                    commentTotalPages = commentsPage.totalPages || 1;
+                                    commentCurrentPage = commentsPage.number || 0;
+                                }
+
+                                if (commentData.length > 0) {
+                                    const renderAllCommentsRecursive = (commentList, level = 0) => {
+                                        return commentList.map(comment => {
+                                            let replyPrefix = '';
+                                            if (comment.replyToUsername) {
+                                                replyPrefix = `<span class="text-primary">回复@${comment.replyToUsername}: </span>`;
+                                            }
+
+                                            const indentStyle = level > 0 ? `style="margin-left: ${level * 40}px; border-left: 2px solid #e9ecef; padding-left: 10px;"` : '';
+                                               
+                                            let html = `
+                                                <div class="mt-2 p-2 bg-light rounded comment-item" data-comment-id="${comment.id}" ${indentStyle}>
+                                                    <div class="d-flex justify-content-between">
+                                                        <strong class="text-info">${comment.username}</strong>
+                                                        <small class="text-muted">${new Date(comment.createdAt).toLocaleString()}</small>
+                                                    </div>
+                                                    <p class="mt-1 mb-0">${replyPrefix}${comment.content}</p>
+                                                    <div class="text-end mt-1">
+                                                        <button class="btn btn-outline-secondary btn-sm reply-comment-btn" data-comment-id="${comment.id}" data-user-id="${comment.userId}" data-username="${comment.username}">
+                                                            <i class="far fa-comment-dots"></i> 回复
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            `;
+
+                                            if (comment.replies && comment.replies.length > 0) {
+                                                html += renderAllCommentsRecursive(comment.replies, level + 1);
+                                            }
+                                            
+                                            return html;
+                                        }).join('');
+                                    };
+
+                                    commentsHtml = renderAllCommentsRecursive(commentData);
+                                }
+
+                                let paginationHtml = '';
+                                if (commentTotalPages > 1 || commentData.length >= 5) {
+                                    paginationHtml = `
+                                        <div class="mt-2 d-flex justify-content-center">
+                                            <nav aria-label="评论回复分页">
+                                                <ul class="pagination pagination-sm">
+                                                    <li class="page-item ${commentCurrentPage === 0 ? 'disabled' : ''}">
+                                                        <a class="page-link" href="#" data-review-id="${review.id}" data-action="prev">上一页</a>
+                                                    </li>
+                                                    <li class="page-item active">
+                                                        <a class="page-link" href="#">第${commentCurrentPage + 1} / ${commentTotalPages} 页</a>
+                                                    </li>
+                                                    <li class="page-item ${commentCurrentPage >= commentTotalPages - 1 ? 'disabled' : ''}">
+                                                        <a class="page-link" href="#" data-review-id="${review.id}" data-action="next">下一页</a>
+                                                    </li>
+                                                </ul>
+                                            </nav>
+                                        </div>
+                                    `;
+                                }
+
+                                review.commentsPageInfo = {
+                                    currentPage: commentCurrentPage,
+                                    pageSize: commentPageSize,
+                                    totalPages: commentTotalPages,
+                                    commentsHtml: commentsHtml,
+                                    paginationHtml: paginationHtml
+                                };
+                                
+                                commentsHtml = commentsHtml + paginationHtml;
+                            } catch (error) {
+                                console.error('获取评论回复失败:', error);
+                                let commentData = [];
+
+                                let errorPaginationHtml = `
+                                    <div class="mt-2 d-flex justify-content-center">
+                                        <nav aria-label="评论回复分页">
+                                            <ul class="pagination pagination-sm">
+                                                <li class="page-item disabled">
+                                                    <a class="page-link" href="#" data-review-id="${review.id}" data-action="prev">上一页</a>
+                                                </li>
+                                                <li class="page-item active">
+                                                    <a class="page-link" href="#">第1 / 1 页</a>
+                                                </li>
+                                                <li class="page-item disabled">
+                                                    <a class="page-link" href="#" data-review-id="${review.id}" data-action="next">下一页</a>
+                                                </li>
+                                            </ul>
+                                        </nav>
+                                    </div>
+                                `;
+                                
+                                commentsHtml = '' + errorPaginationHtml;
+                                
+                                review.commentsPageInfo = {
+                                    currentPage: 0,
+                                    pageSize: 5,
+                                    totalPages: 1,
+                                    commentsHtml: commentsHtml,
+                                    paginationHtml: errorPaginationHtml
+                                };
+                            }
+                            
+                            const likeBtnClass = isLiked ? 'btn-danger liked' : 'btn-outline-danger';
+                            const likeBtnIcon = isLiked ? 'fas fa-thumbs-up' : 'far fa-thumbs-up';
+                            const likeBtnText = isLiked ? '已点赞' : '点赞';
+                            
+                            const favoriteBtnClass = isFavorited ? 'btn-danger favorited' : 'btn-outline-danger';
+                            const favoriteBtnIcon = isFavorited ? 'fas fa-heart' : 'far fa-heart';
+                            const favoriteBtnText = isFavorited ? '已收藏' : '收藏';
+
+                            reviewsHtml += `
+                                <div class="review-item list-group-item list-group-item-action flex-column align-items-start" data-review-id="${review.id}">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1">${review.title}</h5>
+                                        <small class="text-muted">${new Date(review.createdAt).toLocaleDateString()}</small>
+                                    </div>
+                                    <p class="mb-1">${review.content}</p>
+                                    <small class="text-muted">
+                                        <strong>${review.username}</strong> 评论于 
+                                        <span class="rating-stars">${renderStars(review.rating)}</span>
+                                    </small>
+                                    <div class="text-end mt-2">
+                                        <div class="d-flex justify-content-end gap-2 mb-1">
+                                            <button class="btn btn-sm like-btn ${likeBtnClass}" data-review-id="${review.id}">
+                                                <i class="${likeBtnIcon}"></i> ${likeBtnText}
+                                            </button>
+                                            <button class="btn ${favoriteBtnClass} btn-sm favorite-btn" data-review-id="${review.id}" data-product-id="${productId}">
+                                                <i class="${favoriteBtnIcon}"></i> ${favoriteBtnText}
+                                            </button>
+                                            <button class="btn btn-outline-primary btn-sm share-btn" data-review-id="${review.id}" data-product-id="${productId}">
+                                                <i class="far fa-share-square"></i> 分享
+                                            </button>
+                                            <button class="btn btn-outline-info btn-sm reply-review-btn" data-review-id="${review.id}">
+                                                <i class="far fa-comment-dots"></i> 回复
+                                            </button>
+                                        </div>
+                                        <small class="text-muted">发布于 ${new Date(review.createdAt).toLocaleString()}</small> 
+                                        <small class="text-muted ms-2"><i class="far fa-thumbs-up"></i> <span id="like-count-${review.id}">${review.likesCount || 0}</span></small>
+                                        
+                                        ${review.merchantReply ? `
+                                        <div class="mt-3 p-3 bg-light rounded">
+                                            <div class="d-flex justify-content-between">
+                                                <strong class="text-primary">商家回复</strong>
+                                                <small class="text-muted">${new Date(review.merchantReply.createdAt).toLocaleString()}</small>
+                                            </div>
+                                            <p class="mt-2">${review.merchantReply.content}</p>
+                                        </div>` : ''}
+                                        
+                                        ${commentsHtml ? `
+                                        <div class="mt-2 comments-container">
+                                            <h6 class="text-muted mb-2">回复：</h6>
+                                            ${commentsHtml}
+                                        </div>` : ''}
+                                    </div>
+                                </div>
+                            `;
+                        }
+                        reviewsContainer.innerHTML = reviewsHtml;
+                    } else {
+                        reviewsContainer.innerHTML = '<p>该商品暂无评价。</p>';
+                    }
+
+                    setupReviewLikeButtons();
+                    setupReviewFavoriteButtons();
+                    setupReviewShareButtons();
+                    setupReviewReplyButtons();
+                    setupReviewCommentsPagination();
+                } catch (error) {
+                    console.error(error);
+                    reviewsContainer.innerHTML = '<p class="text-danger">评价加载失败。</p>';
+                }
+            }
+            
+
+            const addReviewFormContainer = document.getElementById('add-review-form-container');
+            if (token) {
+                addReviewFormContainer.classList.remove('d-none');
+            }
+            
+            const addReviewForm = document.getElementById('add-review-form');
+            addReviewForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const body = {
+                    productId: parseInt(productId, 10),
+                    rating: parseInt(document.getElementById('review-rating').value, 10),
+                    title: document.getElementById('review-title').value,
+                    content: document.getElementById('review-content').value
+                };
+
+                try {
+                    const response = await fetch('/api/reviews', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify(body)
+                    });
+
+                    if(response.ok) {
+                        alert('评价提交成功！');
+                        addReviewForm.reset();
+                        loadReviews();
+                    } else {
+                        const errorData = await response.json();
+                        alert(`提交失败: ${errorData.message}`);
+                    }
+                } catch (error) {
+                    alert('网络错误，提交失败。');
+                }
+            });
+
+            function renderStars(rating) {
+                let stars = '';
+                const fullStars = Math.floor(rating);
+                for (let i = 0; i < fullStars; i++) stars += '<i class="fa-solid fa-star"></i>';
+                if (rating % 1 >= 0.5) stars += '<i class="fa-solid fa-star-half-stroke"></i>';
+                const emptyStars = 5 - Math.ceil(rating);
+                for (let i = 0; i < emptyStars; i++) stars += '<i class="fa-regular fa-star"></i>';
+                return stars;
+            }
+
+            loadReviews();
+
+            const productLikeBtn = document.getElementById('product-like-btn');
+            const productLikeCount = document.getElementById('product-like-count');
+            
+            productLikeBtn.addEventListener('click', async () => {
+                if (!token) {
+                    alert('请先登录后再进行此操作');
+                    window.location.href = '/user/login.html';
+                    return;
+                }
+                
+                const isLiked = productLikeBtn.classList.contains('liked');
+                let currentLikes = parseInt(productLikeCount.textContent);
+                
+                try {
+                    const method = isLiked ? 'DELETE' : 'POST';
+                    const response = await fetch(`/api/products/${productId}/like`, {
+                        method: method,
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        const productResponse = await fetch(`/api/products/${productId}`);
+                        if (productResponse.ok) {
+                            const updatedProduct = await productResponse.json();
+                            const updatedLikes = updatedProduct.likesCount || 0;
+
+                            if (isLiked) {
+                                productLikeBtn.classList.remove('liked', 'btn-danger');
+                                productLikeBtn.classList.add('btn-outline-danger');
+                                productLikeBtn.innerHTML = '<i class="far fa-thumbs-up"></i> <span id="product-like-count">' + updatedLikes + '</span> 点赞';
+                            } else {
+                                productLikeBtn.classList.add('liked', 'btn-danger');
+                                productLikeBtn.classList.remove('btn-outline-danger');
+                                productLikeBtn.innerHTML = '<i class="fas fa-thumbs-up"></i> <span id="product-like-count">' + updatedLikes + '</span> 已点赞';
+                            }
+                        }
+                    } else {
+                        throw new Error('操作失败');
+                    }
+                } catch (error) {
+                    console.error('商品点赞操作失败:', error);
+                    alert('点赞操作失败，请稍后再试');
+                }
+            });
+            
+
+            const productFavoriteBtn = document.getElementById('product-favorite-btn');
+
+            console.log('初始化加载第一页评论');
+            loadReviews(0);
+            
+            productFavoriteBtn.addEventListener('click', async () => {
+                if (!token) {
+                    alert('请先登录后再进行此操作');
+                    window.location.href = '/user/login.html';
+                    return;
+                }
+                
+                const isFavorited = productFavoriteBtn.classList.contains('favorited');
+                
+                try {
+                    const method = isFavorited ? 'DELETE' : 'POST';
+                    const response = await fetch(`/api/products/${productId}/favorite`, {
+                        method: method,
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        if (isFavorited) {
+                            productFavoriteBtn.classList.remove('favorited', 'btn-danger');
+                            productFavoriteBtn.classList.add('btn-outline-danger');
+                            productFavoriteBtn.innerHTML = '<i class="far fa-heart"></i> 收藏';
+                        } else {
+                            productFavoriteBtn.classList.add('favorited', 'btn-danger');
+                            productFavoriteBtn.classList.remove('btn-outline-danger');
+                            productFavoriteBtn.innerHTML = '<i class="fas fa-heart"></i> 已收藏';
+                        }
+                    } else {
+                        throw new Error('操作失败');
+                    }
+                } catch (error) {
+                    console.error('商品收藏操作失败:', error);
+                    alert('收藏操作失败，请稍后再试');
+                }
+            });
+
+            function setupReviewLikeButtons() {
+                document.querySelectorAll('.like-btn').forEach(button => {
+                    button.addEventListener('click', async function() {
+                        const reviewId = this.getAttribute('data-review-id');
+                        const isLiked = this.classList.contains('liked');
+                        
+                        if (!token) {
+                            alert('请先登录');
+                            return;
+                        }
+                        
+                        try {
+                            const url = `/api/reviews/${reviewId}/like`;
+                            const method = isLiked ? 'DELETE' : 'POST';
+                            
+                            const response = await fetch(url, {
+                                method: method,
+                                headers: {
+                                    'Authorization': `Bearer ${token}`,
+                                    'Content-Type': 'application/json'
+                                }
+                            });
+                            
+                            if (response.ok) {
+                                const reviewResponse = await fetch(`/api/reviews/${reviewId}`);
+                                if (reviewResponse.ok) {
+                                    const updatedReview = await reviewResponse.json();
+                                    const updatedLikes = updatedReview.likesCount || 0;
+
+                                    const likeCountSpan = document.getElementById(`like-count-${reviewId}`);
+                                    
+                                    if (isLiked) {
+                                        this.classList.remove('btn-danger', 'liked');
+                                        this.classList.add('btn-outline-danger');
+                                        this.innerHTML = '<i class="far fa-thumbs-up"></i> 点赞';
+                                        likeCountSpan.textContent = updatedLikes;
+                                    } else {
+                                        this.classList.remove('btn-outline-danger');
+                                        this.classList.add('btn-danger', 'liked');
+                                        this.innerHTML = '<i class="fas fa-thumbs-up"></i> 已点赞';
+                                        likeCountSpan.textContent = updatedLikes;
+                                    }
+                                } else {
+                                    throw new Error('获取更新后的评价信息失败');
+                                }
+                            } else if (response.status === 401) {
+                                localStorage.removeItem('jwtToken');
+                                const errorData = await response.json();
+                                alert(errorData.message || '登录已过期，请重新登录');
+                                window.location.href = '/login';
+                            } else {
+                                const errorData = await response.json();
+                                alert(errorData.message || '操作失败');
+                            }
+                        } catch (error) {
+                            console.error('点赞操作失败:', error);
+                            alert('网络错误，请重试');
+                        }
+                    });
+                });
+            }
+
+            function setupReviewFavoriteButtons() {
+                document.querySelectorAll('.favorite-btn').forEach(button => {
+                    button.addEventListener('click', async function() {
+                        if (!token) {
+                            alert('请先登录后再进行此操作');
+                            window.location.href = '/user/login.html';
+                            return;
+                        }
+                        
+                        const reviewId = this.dataset.reviewId;
+                        const isFavorited = this.classList.contains('favorited');
+                        
+                        try {
+                            const method = isFavorited ? 'DELETE' : 'POST';
+                            const response = await fetch(`/api/reviews/${reviewId}/favorite`, {
+                                method: method,
+                                headers: {
+                                    'Authorization': `Bearer ${token}`,
+                                    'Content-Type': 'application/json'
+                                }
+                            });
+                            
+                            if (response.ok) {
+                                if (isFavorited) {
+                                    this.classList.remove('favorited', 'btn-danger');
+                                    this.classList.add('btn-outline-danger');
+                                    this.innerHTML = '<i class="far fa-heart"></i> 收藏';
+                                } else {
+                                    this.classList.add('favorited', 'btn-danger');
+                                    this.classList.remove('btn-outline-danger');
+                                    this.innerHTML = '<i class="fas fa-heart"></i> 已收藏';
+                                }
+                            } else if (response.status === 401) {
+                                localStorage.removeItem('jwtToken');
+                                alert('登录已过期，请重新登录');
+                                window.location.href = '/user/login.html';
+                            } else {
+                                const errorData = await response.json();
+                                throw new Error(errorData.message || '操作失败');
+                            }
+                        } catch (error) {
+                            console.error('评论收藏操作失败:', error);
+                            alert('收藏操作失败，请稍后再试');
+                        }
+                    });
+                });
+            }
+            
+
+            function setupReviewShareButtons() {
+                document.querySelectorAll('.share-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const reviewId = this.dataset.reviewId;
+                        const productId = this.dataset.productId;
+                        const shareUrl = `${window.location.origin}/product/detail.html?id=${productId}#review-${reviewId}`;
+
+                        navigator.clipboard.writeText(shareUrl).then(() => {
+                            alert('分享链接已复制到剪贴板！');
+                        }).catch(err => {
+                            console.error('复制失败:', err);
+                            prompt('请手动复制分享链接:', shareUrl);
+                        });
+                    });
+                });
+            }
+
+            function setupReviewReplyButtons() {
+                document.querySelectorAll('.reply-review-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const reviewId = this.dataset.reviewId;
+                        showReplyForm(reviewId, null, null, null);
+                    });
+                });
+
+                document.querySelectorAll('.reply-comment-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const commentId = this.dataset.commentId;
+                        const userId = this.dataset.userId;
+                        const username = this.dataset.username;
+                        showReplyForm(null, commentId, username, userId);
+                    });
+                });
+            }
+
+            function showReplyForm(reviewId, parentId, replyToUsername, replyToUserId) {
+                const formId = reviewId ? `reply-form-${reviewId}` : `reply-comment-${parentId}`;
+                let replyForm = document.getElementById(formId);
+                if (replyForm) {
+                    replyForm.remove();
+                    return;
+                }
+
+                replyForm = document.createElement('div');
+                replyForm.id = formId;
+                replyForm.className = 'mt-3 p-3 bg-light rounded';
+                
+                let title = '回复评论';
+                let placeholder = '请输入回复内容';
+                if (replyToUsername) {
+                    title = `回复@${replyToUsername}`;
+                    placeholder = `回复@${replyToUsername}: `;
+                }
+                
+                replyForm.innerHTML = `
+                    <h6>${title}</h6>
+                    <textarea class="form-control mb-2" id="reply-content-${formId}" rows="2" placeholder="${placeholder}"></textarea>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-primary btn-sm submit-reply">提交回复</button>
+                        <button class="btn btn-secondary btn-sm cancel-reply">取消</button>
+                    </div>
+                `;
+
+                if (reviewId) {
+                    document.querySelector(`[data-review-id="${reviewId}"]`).closest('.list-group-item').appendChild(replyForm);
+                } else {
+                    document.querySelector(`[data-comment-id="${parentId}"]`).appendChild(replyForm);
+                }
+
+            replyForm.querySelector('.submit-reply').addEventListener('click', async () => {
+                if (!token) {
+                    alert('请先登录后再进行此操作');
+                    return;
+                }
+                
+                const content = document.getElementById(`reply-content-${formId}`).value.trim();
+                if (!content) {
+                    alert('请输入回复内容');
+                    return;
+                }
+                
+                try {
+                    const requestData = {
+                        reviewId: reviewId ? parseInt(reviewId) : parseInt(document.querySelector(`[data-comment-id="${parentId}"]`).closest('.list-group-item').querySelector('[data-review-id]').dataset.reviewId),
+                        content: content
+                    };
+
+                    if (parentId) {
+                        requestData.parentId = parseInt(parentId);
+                    }
+                    if (replyToUserId) {
+                        requestData.replyToUserId = parseInt(replyToUserId);
+                    }
+
+                    const response = await fetch('/api/comments', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify(requestData)
+                    });
+                    
+                    if (response.ok) {
+                        const toast = document.createElement('div');
+                        toast.className = 'position-fixed bottom-4 right-4 bg-success text-white px-4 py-2 rounded shadow-lg z-50';
+                        toast.style.opacity = '0';
+                        toast.style.transition = 'opacity 0.3s ease';
+                        toast.textContent = '回复成功！';
+                        document.body.appendChild(toast);
+
+                        setTimeout(() => toast.style.opacity = '1', 10);
+                        
+                        replyForm.remove();
+
+                        console.log('回复成功，重新加载当前页评论，页码:', currentPage);
+                        loadReviews(currentPage);
+
+                        setTimeout(() => {
+                            toast.style.opacity = '0';
+                            setTimeout(() => document.body.removeChild(toast), 300);
+                        }, 3000);
+                    } else if (response.status === 401) {
+                        localStorage.removeItem('jwtToken');
+                        alert('登录已过期，请重新登录');
+                        window.location.href = '/user/login.html';
+                    } else {
+                        const errorData = await response.json();
+                        alert(`回复失败: ${errorData.message}`);
+                    }
+                } catch (error) {
+                    console.error('回复操作失败:', error);
+                    alert('回复失败，请稍后再试');
+                }
+            });
+
+                replyForm.querySelector('.cancel-reply').addEventListener('click', () => {
+                    replyForm.remove();
+                });
+            }
+
+            function setupReviewCommentsPagination() {
+                document.addEventListener('click', function(e) {
+                    if (e.target.closest('.pagination a[data-action="prev"]') || e.target.closest('.pagination a[data-action="next"]')) {
+                        e.preventDefault();
+                        const link = e.target.closest('a');
+                        const reviewId = parseInt(link.dataset.reviewId);
+                        const action = link.dataset.action;
+                        const reviewElement = document.querySelector(`.review-item[data-review-id="${reviewId}"]`);
+
+                        let review = null;
+                        if (window.reviewData && window.reviewData.length > 0) {
+                            review = window.reviewData.find(r => r.id === reviewId);
+                        }
+                        
+                        if (!review || !review.commentsPageInfo || !reviewElement) {
+                            console.error('找不到评论数据、分页信息或对应的DOM元素');
+                            return;
+                        }
+                        
+                        let newPage = review.commentsPageInfo.currentPage;
+                        const pageSize = review.commentsPageInfo.pageSize;
+                        const totalPages = review.commentsPageInfo.totalPages;
+
+                        if (action === 'prev' && newPage > 0) {
+                            newPage--;
+                        } else if (action === 'next' && newPage < totalPages - 1) {
+                            newPage++;
+                        } else {
+                            return;
+                        }
+
+                        const commentsContainer = reviewElement.querySelector('.comments-container');
+                        commentsContainer.innerHTML = '<div class="text-center py-3"><i class="fas fa-spinner fa-spin"></i> 加载中...</div>';
+                        fetch(`/api/comments/review/${reviewId}?page=${newPage}&size=${pageSize}`, {
+                            headers: {
+                                'Authorization': token ? `Bearer ${token}` : ''
+                            }
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('网络响应失败');
+                            }
+                            return response.json();
+                        })
+                        .then(commentsPage => {
+                            const commentData = commentsPage.content || [];
+                            const currentTotalPages = commentsPage.totalPages || 1;
+
+                            const renderAllCommentsRecursive = (commentList, level = 0) => {
+                                return commentList.map(comment => {
+                                    let replyPrefix = '';
+                                    if (comment.replyToUsername) {
+                                        replyPrefix = `<span class="text-primary">回复@${comment.replyToUsername}: </span>`;
+                                    }
+
+                                    const indentStyle = level > 0 ? `style="margin-left: ${level * 40}px; border-left: 2px solid #e9ecef; padding-left: 10px;"` : '';
+                                       
+                                    let html = `
+                                        <div class="mt-2 p-2 bg-light rounded comment-item" data-comment-id="${comment.id}" ${indentStyle}>
+                                            <div class="d-flex justify-content-between">
+                                                <strong class="text-info">${comment.username}</strong>
+                                                <small class="text-muted">${new Date(comment.createdAt).toLocaleString()}</small>
+                                            </div>
+                                            <p class="mt-1 mb-0">${replyPrefix}${comment.content}</p>
+                                            <div class="text-end mt-1">
+                                                <button class="btn btn-outline-secondary btn-sm reply-comment-btn" data-comment-id="${comment.id}" data-user-id="${comment.userId}" data-username="${comment.username}">
+                                                    <i class="far fa-comment-dots"></i> 回复
+                                                </button>
+                                            </div>
+                                        </div>
+                                    `;
+
+                                    if (comment.replies && comment.replies.length > 0) {
+                                        html += renderAllCommentsRecursive(comment.replies, level + 1);
+                                    }
+                                    
+                                    return html;
+                                }).join('');
+                            };
+
+                            let commentsHtml = renderAllCommentsRecursive(commentData);
+
+                            let paginationHtml = '';
+                            if (currentTotalPages > 1 || commentData.length >= 5) {
+                                paginationHtml = `
+                                    <div class="mt-2 d-flex justify-content-center">
+                                        <nav aria-label="评论回复分页">
+                                            <ul class="pagination pagination-sm">
+                                                <li class="page-item ${newPage === 0 ? 'disabled' : ''}">
+                                                    <a class="page-link" href="#" data-review-id="${reviewId}" data-action="prev">上一页</a>
+                                                </li>
+                                                <li class="page-item active">
+                                                    <a class="page-link" href="#">第${newPage + 1} / ${currentTotalPages} 页</a>
+                                                </li>
+                                                <li class="page-item ${newPage >= currentTotalPages - 1 ? 'disabled' : ''}">
+                                                    <a class="page-link" href="#" data-review-id="${reviewId}" data-action="next">下一页</a>
+                                                </li>
+                                            </ul>
+                                        </nav>
+                                    </div>
+                                `;
+                            }
+
+                            review.commentsPageInfo = {
+                                currentPage: newPage,
+                                pageSize: pageSize,
+                                totalPages: currentTotalPages,
+                                commentsHtml: commentsHtml,
+                                paginationHtml: paginationHtml
+                            };
+
+                            commentsContainer.innerHTML = commentsHtml + paginationHtml;
+                        })
+                        .catch(error => {
+                            console.error('获取评论回复失败:', error);
+                            commentsContainer.innerHTML = '<div class="text-center text-danger py-3">加载失败，请稍后重试</div>';
+                        });
+                    }
+                });
+            }
+            
+
+            if (token) {
+                try {
+                    const likeResponse = await fetch(`/api/products/${productId}/like/status`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    
+                    if (likeResponse.ok) {
+                        const isLiked = await likeResponse.json();
+                        if (isLiked) {
+                            productLikeBtn.classList.add('liked', 'btn-danger');
+                            productLikeBtn.classList.remove('btn-outline-danger');
+                            productLikeBtn.innerHTML = '<i class="fas fa-thumbs-up"></i> <span id="product-like-count">' + productLikeCount.textContent + '</span> 已点赞';
+                        }
+                    } else if (likeResponse.status === 401) {
+                        localStorage.removeItem('jwtToken');
+                        console.log('登录已过期，请重新登录');
+                    }
+
+                    const favoriteResponse = await fetch(`/api/products/${productId}/favorite/status`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    
+                    if (favoriteResponse.ok) {
+                        const isFavorited = await favoriteResponse.json();
+                        if (isFavorited) {
+                            productFavoriteBtn.classList.add('favorited', 'btn-danger');
+                            productFavoriteBtn.classList.remove('btn-outline-danger');
+                            productFavoriteBtn.innerHTML = '<i class="fas fa-heart"></i> 已收藏';
+                        }
+                    } else if (favoriteResponse.status === 401) {
+                        localStorage.removeItem('jwtToken');
+                        console.log('登录已过期，请重新登录');
+                    }
+                } catch (error) {
+                    console.error('获取商品状态失败:', error);
+                }
+            }
+            setupReviewCommentsPagination();
+        });
+    </script>
+</body>
+</html>

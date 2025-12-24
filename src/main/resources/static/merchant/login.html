@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>商家登录 - 众评优选</title>
+<link href="../libs/bootstrap/5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="../libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet"/>
+<style>
+        body {
+            background-color: #f8f9fa;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-container {
+            width: 100%;
+            max-width: 400px;
+        }
+        .login-card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .login-header {
+            background-color: #165DFF;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .login-body {
+            padding: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-control {
+            border-radius: 5px;
+        }
+        .btn-primary {
+            background-color: #165DFF;
+            border-color: #165DFF;
+            width: 100%;
+            padding: 10px;
+        }
+        .btn-primary:hover {
+            background-color: #0E42C0;
+            border-color: #0E42C0;
+        }
+        .logo-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .logo {
+            font-size: 48px;
+            color: #165DFF;
+        }
+    </style>
+</head>
+<body>
+<div class="login-container">
+<div class="login-card">
+<div class="login-header">
+<h2>商家登录</h2>
+</div>
+<div class="login-body">
+<div class="logo-container">
+<i class="fa fa-store logo"></i>
+</div>
+<form id="loginForm">
+<div class="form-group">
+<label for="username">商家账号</label>
+<div class="input-group">
+<div class="input-group-prepend">
+<div class="input-group-text">
+<i class="fa fa-user"></i>
+</div>
+</div>
+<input class="form-control" id="username" placeholder="请输入商家账号" required="" type="text"/>
+</div>
+</div>
+<div class="form-group">
+<label for="password">密码</label>
+<div class="input-group">
+<div class="input-group-prepend">
+<div class="input-group-text">
+<i class="fa fa-lock"></i>
+</div>
+</div>
+<input class="form-control" id="password" placeholder="请输入密码" required="" type="password"/>
+</div>
+</div>
+<button class="btn btn-primary" type="submit">登录</button>
+<div class="alert alert-danger mt-3 d-none" id="errorMessage" role="alert"></div>
+</form>
+</div>
+</div>
+</div>
+<script src="../libs/jquery/3.7.1/dist/jquery.min.js"></script>
+<script src="../libs/bootstrap/5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('商家登录页面加载完成');
+
+            const jwtToken = localStorage.getItem('jwtToken');
+            const userJson = localStorage.getItem('user');
+            
+            console.log('本地存储状态:', {
+                hasJwtToken: !!jwtToken,
+                hasUserInfo: !!userJson
+            });
+            
+            if (jwtToken) {
+              const userInfo = userJson ? JSON.parse(userJson) : null;
+
+              if (userInfo && userInfo.roles && userInfo.roles.includes('ROLE_MERCHANT')) {
+                console.log('检测到已有商家登录信息，尝试重定向到商家后台');
+                window.location.href = '/merchant/dashboard.html';
+                return;
+              }
+
+              if (userInfo && userInfo.roles && !userInfo.roles.includes('ROLE_ADMIN') && !userInfo.roles.includes('ROLE_MERCHANT')) {
+                console.log('检测到普通用户登录信息，清除并重新开始');
+                localStorage.removeItem('jwtToken');
+                localStorage.removeItem('user');
+              }
+
+              if (userInfo && userInfo.roles && userInfo.roles.includes('ROLE_ADMIN')) {
+                console.log('检测到管理员登录信息，清除并重新开始');
+                localStorage.removeItem('jwtToken');
+                localStorage.removeItem('user');
+              }
+            } else if (userJson) {
+                console.log('检测到不完整的登录信息，清除并重新开始');
+                localStorage.removeItem('jwtToken');
+                localStorage.removeItem('user');
+            }
+
+            const loginForm = document.getElementById('loginForm');
+            const errorMessageDiv = document.getElementById('errorMessage');
+            const usernameInput = document.getElementById('username');
+            const passwordInput = document.getElementById('password');
+
+            usernameInput.addEventListener('input', () => {
+                errorMessageDiv.textContent = '';
+                errorMessageDiv.classList.add('d-none');
+            });
+            
+            passwordInput.addEventListener('input', () => {
+                errorMessageDiv.textContent = '';
+                errorMessageDiv.classList.add('d-none');
+            });
+
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const username = usernameInput.value.trim();
+                const password = passwordInput.value;
+
+                if (!username || !password) {
+                    errorMessageDiv.textContent = '请输入账号和密码';
+                    errorMessageDiv.classList.remove('d-none');
+                    return;
+                }
+
+                errorMessageDiv.textContent = '';
+                errorMessageDiv.classList.add('d-none');
+
+                const submitButton = loginForm.querySelector('button[type="submit"]');
+                const originalButtonText = submitButton.innerHTML;
+                submitButton.disabled = true;
+                submitButton.innerHTML = '<i class="fa fa-spinner fa-spin mr-2"></i>登录中...';
+                
+                try {
+                    console.log('开始登录请求，用户名:', username);
+
+                    const startTime = Date.now();
+                    
+                    const response = await fetch('/api/merchant/login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ username, password })
+                    });
+
+                    const requestTime = Date.now() - startTime;
+                    console.log('登录请求完成，状态码:', response.status, '耗时:', requestTime, 'ms');
+                    
+                    if (response.ok) {
+                        try {
+                            const data = await response.json();
+                            console.log('登录成功，返回数据:', {
+                                hasToken: !!data.token,
+                                hasMerchantInfo: !!data.merchant
+                            });
+
+                            if (!data.token || !data.merchant) {
+                                throw new Error('登录成功但返回数据不完整');
+                            }
+
+                            if (!data.merchant.roles) {
+                                data.merchant.roles = ['ROLE_MERCHANT'];
+                                console.log('商家信息中缺少roles字段，已添加默认角色');
+                            }
+
+                            if (!data.merchant.name && data.merchant.username) {
+                                data.merchant.name = data.merchant.username;
+                                console.log('商家信息中缺少name字段，已使用username作为name');
+                            }
+
+                            localStorage.setItem('jwtToken', data.token);
+                            localStorage.setItem('user', JSON.stringify(data.merchant));
+
+                            
+                            console.log('登录信息已存储到本地，准备重定向');
+                            console.log('商家信息:', {
+                                name: data.merchant.name,
+                                username: data.merchant.username,
+                                roles: data.merchant.roles
+                            });
+
+                            window.location.href = '/merchant/dashboard.html';
+                        } catch (jsonError) {
+                            console.error('解析登录响应失败:', jsonError);
+                            errorMessageDiv.textContent = '登录响应格式错误，请重试';
+                            errorMessageDiv.classList.remove('d-none');
+                        }
+                    } else {
+                        console.error('登录失败，状态码:', response.status);
+                        
+                        let errorMessage = '账号或密码错误';
+                        
+                        try {
+                            const errorData = await response.json();
+                            console.error('登录错误详情:', errorData);
+                            errorMessage = errorData.message || errorMessage;
+                        } catch (e) {
+                            console.error('无法解析错误响应:', e);
+                            if (response.status === 401) {
+                                errorMessage = '账号或密码错误，请重新输入';
+                            } else if (response.status === 429) {
+                                errorMessage = '登录请求过于频繁，请稍后再试';
+                            } else if (response.status >= 500) {
+                                errorMessage = '服务器暂时无法处理请求，请稍后再试';
+                            }
+                        }
+                        
+                        errorMessageDiv.textContent = errorMessage;
+                        errorMessageDiv.classList.remove('d-none');
+                    }
+                } catch (error) {
+                    console.error('登录请求异常:', error);
+                    errorMessageDiv.textContent = '网络连接异常，请检查您的网络设置';
+                    errorMessageDiv.classList.remove('d-none');
+                } finally {
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = originalButtonText;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

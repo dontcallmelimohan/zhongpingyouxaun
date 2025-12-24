@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>商家设置 - 众评优选商家后台</title>
+<link href="../libs/bootstrap/5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="../libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet"/>
+<link href="../libs/admin-lte/3.2.0/dist/css/adminlte.min.css" rel="stylesheet"/>
+<script src="js/merchant-auth.js"></script>
+<script src="../js/region-selector.js"></script>
+<style>
+        .content-wrapper {
+            background-color: #f8f9fa;
+        }
+        .card-header {
+            background-color: #ffffff;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        .sidebar-dark-primary {
+            background-color: #343a40;
+        }
+        .btn-primary {
+            background-color: #165DFF;
+            border-color: #165DFF;
+        }
+        .btn-primary:hover {
+            background-color: #0E42C0;
+            border-color: #0E42C0;
+        }
+        .btn-success {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+        .btn-success:hover {
+            background-color: #218838;
+            border-color: #218838;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+        .btn-danger:hover {
+            background-color: #c82333;
+            border-color: #c82333;
+        }
+        .form-control.is-invalid {
+            border-color: #dc3545;
+        }
+        .form-control.is-valid {
+            border-color: #28a745;
+        }
+        .tab-content {
+            margin-top: 20px;
+        }
+
+        .region-selector-container .form-group {
+            display: flex;
+            align-items: center;
+            flex-wrap: nowrap;
+            margin-bottom: 5px !important;
+            width: 100%;
+        }
+        
+        .region-selector-container .form-control {
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            font-size: 12px;
+            padding: 5px 10px;
+            min-width: auto !important;
+            width: 100%;
+        }
+        
+        .region-selector-container label {
+            font-size: 12px;
+            min-width: 50px;
+            margin-right: 5px;
+            font-weight: 500;
+            color: #495057;
+        }
+    </style>
+</head>
+<body class="hold-transition sidebar-mini">
+<div class="wrapper">
+<nav class="main-header navbar navbar-expand navbar-white navbar-light">
+<ul class="navbar-nav">
+<li class="nav-item">
+<a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fa fa-bars"></i></a>
+</li>
+</ul>
+<ul class="navbar-nav ml-auto">
+<li class="nav-item">
+<a class="nav-link" href="/index.html" role="button">
+<i class="fa fa-home mr-1"></i> 返回首页
+                    </a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="#" id="logoutButton">
+<i class="fa fa-sign-out mr-1"></i> 退出登录
+                    </a>
+</li>
+<li class="nav-item dropdown user-menu">
+<a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#">
+<i class="fa fa-user-circle mr-2" style="font-size: 20px;"></i>
+<span class="d-none d-md-inline" id="merchantName">商家名称</span>
+</a>
+<div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+<a class="dropdown-item" href="profile.html">
+<i class="fa fa-user mr-2"></i> 个人资料
+                        </a>
+<a class="dropdown-item" href="#">
+<i class="fa fa-cog mr-2"></i> 设置
+                        </a>
+</div>
+</li>
+</ul>
+</nav>
+<aside class="main-sidebar sidebar-dark-primary elevation-4">
+<a class="brand-link" href="dashboard.html">
+<i class="fa fa-store mr-2" style="font-size: 24px;"></i>
+<span class="brand-text font-weight-light">众评优选商家后台</span>
+</a>
+<div class="sidebar">
+<div class="user-panel mt-3 pb-3 mb-3 d-flex">
+<div class="image">
+<i class="fa fa-user-circle text-white" style="font-size: 32px;"></i>
+</div>
+<div class="info">
+<a class="d-block" href="profile.html" id="sidebar-merchant-name">商家名称</a>
+</div>
+</div>
+<nav class="mt-2">
+<ul class="nav nav-pills nav-sidebar flex-column" data-accordion="false" data-widget="treeview" role="menu">
+<li class="nav-item">
+<a class="nav-link" href="dashboard.html">
+<i class="nav-icon fa fa-dashboard"></i>
+<p>仪表盘</p>
+</a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="products.html">
+<i class="nav-icon fa fa-shopping-bag"></i>
+<p>商品管理</p>
+</a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="reviews.html">
+<i class="nav-icon fa fa-comment"></i>
+<p>评价管理</p>
+</a>
+</li>
+<li class="nav-item">
+<a class="nav-link active" href="profile.html">
+<i class="nav-icon fa fa-user"></i>
+<p>商家设置</p>
+</a>
+</li>
+</ul>
+</nav>
+</div>
+</aside>
+<div class="content-wrapper">
+<div class="content-header">
+<div class="container-fluid">
+<div class="row mb-2">
+<div class="col-sm-6">
+<h1 class="m-0">商家设置</h1>
+</div>
+</div>
+</div>
+<div class="content">
+<div class="container-fluid">
+<div class="card">
+<div class="card-header">
+<ul class="nav nav-tabs card-header-tabs" id="settingsTabs">
+<li class="nav-item">
+<a class="nav-link active" data-toggle="tab" href="#basic-info" id="basic-info-tab">基本信息</a>
+</li>
+<li class="nav-item">
+<a class="nav-link" data-toggle="tab" href="#password" id="password-tab">修改密码</a>
+</li>
+</ul>
+</div>
+<div class="card-body">
+<div class="tab-content" id="settingsTabContent">
+<div class="tab-pane fade show active" id="basic-info">
+<form id="basicInfoForm">
+<div class="row">
+<div class="col-md-12">
+<div class="form-group">
+<label for="merchantNameInput">商家名称 <span class="text-danger">*</span></label>
+<input class="form-control" id="merchantNameInput" name="name" placeholder="请输入商家名称" required="" type="text"/>
+</div>
+<div class="form-group">
+<label for="merchantDescription">商家描述</label>
+<textarea class="form-control" id="merchantDescription" name="description" placeholder="请输入商家描述" rows="4"></textarea>
+</div>
+<div class="form-group">
+<label for="address">商家地址 <span class="text-danger">*</span></label>
+<input class="form-control" id="address" name="address" placeholder="请输入商家地址" required="" type="text"/>
+</div>
+<div class="row region-selector-container" style="margin-bottom: 15px;">
+<div class="col-md-4">
+<div class="form-group" style="margin-bottom: 5px;">
+<label for="merchantProvince" style="font-size: 12px; min-width: 50px; margin-right: 5px;">省份</label>
+<select class="form-control" id="merchantProvince" style="min-width: auto; width: 100%; font-size: 12px; padding: 5px 10px;"></select>
+</div>
+</div>
+<div class="col-md-4">
+<div class="form-group" style="margin-bottom: 5px;">
+<label for="merchantCity" style="font-size: 12px; min-width: 50px; margin-right: 5px;">城市</label>
+<select class="form-control" id="merchantCity" style="min-width: auto; width: 100%; font-size: 12px; padding: 5px 10px;"></select>
+</div>
+</div>
+<div class="col-md-4">
+<div class="form-group" style="margin-bottom: 5px;">
+<label for="merchantArea" style="font-size: 12px; min-width: 50px; margin-right: 5px;">区县</label>
+<select class="form-control" id="merchantArea" style="min-width: auto; width: 100%; font-size: 12px; padding: 5px 10px;"></select>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="row mt-4">
+<div class="col-md-12 text-right">
+<button class="btn btn-primary" type="submit">保存修改</button>
+</div>
+</div>
+</form>
+</div>
+<div class="tab-pane fade" id="password">
+<form id="passwordForm">
+<div class="row">
+<div class="col-md-6">
+<div class="form-group">
+<label for="currentPassword">当前密码 <span class="text-danger">*</span></label>
+<input class="form-control" id="currentPassword" name="currentPassword" placeholder="请输入当前密码" required="" type="password"/>
+</div>
+<div class="form-group">
+<label for="newPassword">新密码 <span class="text-danger">*</span></label>
+<input class="form-control" id="newPassword" name="newPassword" placeholder="请输入新密码" required="" type="password"/>
+<small class="form-text text-muted">密码长度至少8位，包含字母和数字</small>
+</div>
+<div class="form-group">
+<label for="confirmPassword">确认新密码 <span class="text-danger">*</span></label>
+<input class="form-control" id="confirmPassword" name="confirmPassword" placeholder="请再次输入新密码" required="" type="password"/>
+</div>
+</div>
+</div>
+<div class="row mt-4">
+<div class="col-md-12 text-right">
+<button class="btn btn-primary" type="submit">修改密码</button>
+</div>
+</div>
+</form>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+<script src="../libs/jquery/3.7.1/dist/jquery.min.js"></script>
+<script src="../libs/bootstrap/5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../libs/admin-lte/3.2.0/dist/js/adminlte.min.js"></script>
+<script>
+        const token = localStorage.getItem('jwtToken');
+        if (!token) {
+            window.location.href = 'login.html';
+        }
+        
+        const merchant = JSON.parse(localStorage.getItem('user'));
+        if (!merchant) {
+            window.location.href = 'login.html';
+        }
+
+        if (merchant && merchant.name) {
+            document.getElementById('merchantName').textContent = merchant.name;
+            document.getElementById('sidebar-merchant-name').textContent = merchant.name;
+        }
+
+        document.getElementById('logoutButton').addEventListener('click', () => {
+            localStorage.removeItem('jwtToken');
+            localStorage.removeItem('user');
+            window.location.href = 'login.html';
+        });
+
+        const HEADERS = {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        };
+
+        async function initRegionSelector() {
+            if (defaultRegionSelector) {
+                try {
+                    await defaultRegionSelector.init('#merchantProvince', '#merchantCity', '#merchantArea');
+                } catch (error) {
+                    console.error('初始化地区选择器失败:', error);
+                }
+            }
+        }
+
+        async function loadMerchantDetails() {
+            try {
+                const response = await fetch('http://localhost:8080/api/merchant/profile', {
+                    headers: HEADERS
+                });
+                
+                if (response.ok) {
+                    const merchantData = await response.json();
+
+                    document.getElementById('merchantNameInput').value = merchantData.name || '';
+                    document.getElementById('merchantDescription').value = merchantData.description || '';
+                    document.getElementById('address').value = merchantData.address || '';
+
+                    if (defaultRegionSelector) {
+                        await initRegionSelector();
+                        
+                        defaultRegionSelector.setSelectedRegions(
+                            '#merchantProvince',
+                            '#merchantCity',
+                            '#merchantArea',
+                            {
+                                province: merchantData.province || '',
+                                city: merchantData.city || '',
+                                area: merchantData.area || ''
+                            }
+                        );
+                    }
+                } else {
+                    showNotification('error', '获取商家信息失败，请稍后重试');
+                }
+            } catch (error) {
+                console.error('加载商家信息失败:', error);
+                showNotification('error', '网络错误，请稍后重试');
+            }
+        }
+
+
+
+        document.getElementById('basicInfoForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('merchantNameInput').value.trim();
+            const description = document.getElementById('merchantDescription').value.trim();
+            const address = document.getElementById('address').value.trim();
+
+            if (!name) {
+                showNotification('error', '请输入商家名称');
+                return;
+            }
+            
+            if (!address) {
+                showNotification('error', '请输入商家地址');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/merchant/profile', {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: name,
+                        description: description,
+                        address: address,
+                        province: defaultRegionSelector ? defaultRegionSelector.getSelectedRegions('#merchantProvince', '#merchantCity', '#merchantArea').province : '',
+                        city: defaultRegionSelector ? defaultRegionSelector.getSelectedRegions('#merchantProvince', '#merchantCity', '#merchantArea').city : '',
+                        area: defaultRegionSelector ? defaultRegionSelector.getSelectedRegions('#merchantProvince', '#merchantCity', '#merchantArea').area : ''
+                    })
+                });
+                
+                if (response.ok) {
+                    const updatedMerchant = await response.json();
+                    const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+                    const mergedUser = {
+                        ...updatedMerchant,
+                        roles: currentUser.roles || ['ROLE_MERCHANT']
+                    };
+                    localStorage.setItem('user', JSON.stringify(mergedUser));
+                    document.getElementById('merchantName').textContent = updatedMerchant.name;
+                    document.getElementById('sidebar-merchant-name').textContent = updatedMerchant.name;
+                    alert('修改成功');
+                    showNotification('success', '基本信息更新成功');
+                } else {
+                    const errorData = await response.json();
+                    showNotification('error', errorData.message || '基本信息更新失败');
+                }
+            } catch (error) {
+                console.error('更新基本信息失败:', error);
+                showNotification('error', '网络错误，请稍后重试');
+            }
+        });
+
+        document.getElementById('passwordForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (!currentPassword || !newPassword || !confirmPassword) {
+                showNotification('error', '请填写所有必填字段');
+                return;
+            }
+
+            if (newPassword.length < 8 || !/[A-Za-z]/.test(newPassword) || !/[0-9]/.test(newPassword)) {
+                showNotification('error', '新密码长度至少8位，且必须包含字母和数字');
+                return;
+            }
+
+            if (newPassword !== confirmPassword) {
+                showNotification('error', '两次输入的新密码不一致');
+                return;
+            }
+            
+            try {
+                const response = await fetch('http://localhost:8080/api/merchant/profile/password', {
+                    method: 'PUT',
+                    headers: HEADERS,
+                    body: JSON.stringify({
+                        currentPassword: currentPassword,
+                        newPassword: newPassword
+                    })
+                });
+                
+                if (response.ok) {
+                    document.getElementById('passwordForm').reset();
+                    alert('修改成功');
+                    showNotification('success', '密码修改成功，请重新登录');
+
+                    setTimeout(() => {
+                        localStorage.removeItem('jwtToken');
+                        localStorage.removeItem('user');
+                        window.location.href = 'login.html';
+                    }, 5000);
+                } else {
+                    const errorData = await response.json();
+                    showNotification('error', errorData.message || '密码修改失败');
+                }
+            } catch (error) {
+                console.error('修改密码失败:', error);
+                showNotification('error', '网络错误，请稍后重试');
+            }
+        });
+
+        function showNotification(type, message) {
+            console.log('通知:', type, message);
+        }
+
+        function initTabs() {
+            const tabLinks = document.querySelectorAll('.nav-link[data-toggle="tab"]');
+
+            tabLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+
+                    const targetId = this.getAttribute('href').substring(1);
+                    const targetTab = document.getElementById(targetId);
+
+                    document.querySelectorAll('.tab-pane').forEach(pane => {
+                        pane.classList.remove('show', 'active');
+                    });
+
+                    tabLinks.forEach(l => {
+                        l.classList.remove('active');
+                    });
+
+                    targetTab.classList.add('show', 'active');
+                    this.classList.add('active');
+                });
+            });
+        }
+
+        function initProfilePage() {
+            loadMerchantDetails();
+            initTabs();
+        }
+
+        initMerchantPage(initProfilePage);
+    </script>
+</div>
+
+</div>
+</body>
+</html>

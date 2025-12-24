@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>商品列表 - 众评优选</title>
+<link href="../libs/bootstrap/5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="../libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+<link href="/css/style.css" rel="stylesheet"/>
+</link></head>
+<body>
+<header>
+<nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+<div class="container">
+<a class="navbar-brand fw-bold" href="/index.html">
+<i class="fa-solid fa-star-half-stroke"></i>
+                    众评优选
+                </a>
+<button aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-bs-target="#navbarNav" data-bs-toggle="collapse" type="button">
+<span class="navbar-toggler-icon"></span>
+</button>
+<div class="collapse navbar-collapse" id="navbarNav">
+<div class="d-none d-lg-flex flex-grow-1 mx-4">
+<ul class="navbar-nav me-auto">
+<li class="nav-item dropdown">
+<a aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" id="categoryDropdown" role="button">
+<i class="fa-solid fa-th-large"></i> 全部分类
+                                </a>
+<ul aria-labelledby="categoryDropdown" class="dropdown-menu">
+<li><a class="dropdown-item" href="/product/list.html?categoryId=1">电子产品</a></li>
+<li><a class="dropdown-item" href="/product/list.html?categoryId=2">家居生活</a></li>
+<li><a class="dropdown-item" href="/product/list.html?categoryId=3">美妆个护</a></li>
+<li><a class="dropdown-item" href="/product/list.html?categoryId=4">食品饮料</a></li>
+<li><a class="dropdown-item" href="/product/list.html?categoryId=5">服饰鞋包</a></li>
+</ul>
+</li>
+<li class="nav-item"><a class="nav-link" href="/product/list.html?sort=createdAt,desc">最新上架</a></li>
+<li class="nav-item"><a class="nav-link" href="/product/list.html?sort=reviewCount,desc">评价最多</a></li>
+<li class="nav-item"><a class="nav-link" href="/product/list.html?sort=averageRating,desc">评分最高</a></li>
+</ul>
+</div>
+<form class="d-flex mx-auto my-2 my-lg-0" id="search-form">
+<input aria-label="Search" class="form-control me-2" placeholder="搜索商品、评价..." style="width: 300px;" type="search"/>
+<button class="btn btn-outline-primary" type="submit">
+<i class="fa-solid fa-magnifying-glass"></i>
+</button>
+</form>
+<ul class="navbar-nav ms-auto" id="auth-links">
+<li class="nav-item" id="login-link">
+<a class="btn btn-outline-primary me-2" href="/user/login.html">登录</a>
+</li>
+<li class="nav-item" id="register-link">
+<a class="btn btn-primary" href="/user/register.html">注册</a>
+</li>
+<li class="nav-item dropdown d-none" id="user-profile-link">
+<a aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" id="navbarDropdown" role="button">
+<i class="fa-solid fa-user"></i> 个人中心
+                            </a>
+<ul aria-labelledby="navbarDropdown" class="dropdown-menu">
+<li><a class="dropdown-item" href="/user/profile.html">我的信息</a></li>
+<li><a class="dropdown-item" href="/user/favorites.html">我的收藏</a></li>
+<li><hr class="dropdown-divider"/></li>
+<li><a class="dropdown-item d-none" href="/admin/index.html" id="admin-dashboard-link">管理员后台</a></li>
+<li><a class="dropdown-item d-none" href="/merchant/dashboard.html" id="merchant-dashboard-link">商家后台</a></li>
+<li><hr class="dropdown-divider"/></li>
+<li><button class="dropdown-item" id="logout-button">退出登录</button></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</nav>
+</header>
+<main class="container my-5">
+<h1 class="mb-4" id="page-title">商品列表</h1>
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-3">
+                <label for="regionProvince" class="form-label">省份</label>
+                <select class="form-control" id="regionProvince"></select>
+            </div>
+            <div class="col-md-3">
+                <label for="regionCity" class="form-label">城市</label>
+                <select class="form-control" id="regionCity"></select>
+            </div>
+            <div class="col-md-3">
+                <label for="regionArea" class="form-label">区县</label>
+                <select class="form-control" id="regionArea"></select>
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <button id="filterByRegionBtn" class="btn btn-primary w-100">按地区筛选</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4" id="product-list-container">
+<p>正在加载商品...</p>
+</div>
+<nav aria-label="Page navigation" class="mt-5 d-flex justify-content-center">
+<ul class="pagination" id="pagination-container">
+</ul>
+</nav>
+</main>
+
+<script src="../libs/bootstrap/5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/placeholder-utils.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/interaction.js"></script>
+<script src="/js/region-selector.js"></script>
+<script>
+        async function loadCategories() {
+            try {
+                const response = await fetch('http://localhost:8080/api/categories');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const categories = await response.json();
+
+                const categoryDropdown = document.querySelector('#categoryDropdown + .dropdown-menu');
+                if (categoryDropdown && categories.length > 0) {
+                    categoryDropdown.innerHTML = '';
+                    
+                    categories.forEach(category => {
+                        const listItem = document.createElement('li');
+                        listItem.innerHTML = `
+                            <a class="dropdown-item" href="/product/list.html?categoryId=${category.id}">
+                                ${category.name}
+                            </a>
+                        `;
+                        categoryDropdown.appendChild(listItem);
+                    });
+                }
+            } catch (error) {
+                console.error('加载分类数据失败:', error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadCategories);
+    </script>
+<script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const searchForm = document.getElementById('search-form');
+            if (searchForm) {
+                searchForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const searchInput = searchForm.querySelector('input');
+                    const searchQuery = searchInput.value.trim();
+                    if (searchQuery) {
+                        window.location.href = `/product/list.html?searchQuery=${encodeURIComponent(searchQuery)}`;
+                    }
+                });
+            }
+
+            if (defaultRegionSelector) {
+                try {
+                    await defaultRegionSelector.init('#regionProvince', '#regionCity', '#regionArea');
+                } catch (error) {
+                    console.error('初始化地区选择器失败:', error);
+                }
+            }
+
+            const filterBtn = document.getElementById('filterByRegionBtn');
+            if (filterBtn) {
+                filterBtn.addEventListener('click', () => {
+                    if (defaultRegionSelector) {
+                        const regions = defaultRegionSelector.getSelectedRegions('#regionProvince', '#regionCity', '#regionArea');
+                        const params = new URLSearchParams();
+                        
+                        if (regions.province) {
+                            params.set('province', regions.province);
+                            if (regions.city) {
+                                params.set('city', regions.city);
+                                if (regions.area) {
+                                    params.set('area', regions.area);
+                                }
+                            }
+                        }
+                        
+                        window.location.href = `/product/list.html?${params.toString()}`;
+                    }
+                });
+            }
+        });
+    </script>
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const productListContainer = document.getElementById('product-list-container');
+            const paginationContainer = document.getElementById('pagination-container');
+            const pageTitle = document.getElementById('page-title');
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            const categoryId = urlParams.get('categoryId');
+            const searchQuery = urlParams.get('searchQuery');
+            const sort = urlParams.get('sort');
+            const page = parseInt(urlParams.get('page') || '0', 10);
+            const province = urlParams.get('province');
+            const city = urlParams.get('city');
+            const area = urlParams.get('area');
+            
+            let apiEndpoint = `/api/products?page=${page}`;
+            let categoryName = '';
+
+            if (sort) {
+                apiEndpoint += `&sort=${encodeURIComponent(sort)}`;
+            }
+
+            if (categoryId) {
+                apiEndpoint = `/api/products/category/${categoryId}?page=${page}`;
+                if (sort) {
+                    apiEndpoint += `&sort=${encodeURIComponent(sort)}`;
+                }
+                fetch(`/api/categories/${categoryId}`)
+                    .then(response => {
+                        if (response.ok) {
+                            return response.json();
+                        }
+                        throw new Error('Failed to fetch category');
+                    })
+                    .then(category => {
+                        categoryName = category.name;
+                        pageTitle.textContent = `${categoryName} 商品`;
+                    })
+                    .catch(error => {
+                        console.error('获取分类名称失败:', error);
+                        pageTitle.textContent = `分类商品`;
+                    });
+            } else if (searchQuery) {
+                apiEndpoint = `/api/products/search?name=${encodeURIComponent(searchQuery)}&page=${page}`;
+                if (sort) {
+                    apiEndpoint += `&sort=${encodeURIComponent(sort)}`;
+                }
+                pageTitle.textContent = `搜索 "${searchQuery}" 的结果`;
+            } else if (province) {
+                if (area) {
+                    apiEndpoint = `/api/products/province/${encodeURIComponent(province)}/city/${encodeURIComponent(city)}/area/${encodeURIComponent(area)}?page=${page}`;
+                    pageTitle.textContent = `${province}${city}${area} 地区商品`;
+                } else if (city) {
+                    apiEndpoint = `/api/products/province/${encodeURIComponent(province)}/city/${encodeURIComponent(city)}?page=${page}`;
+                    pageTitle.textContent = `${province}${city} 地区商品`;
+                } else {
+                    apiEndpoint = `/api/products/province/${encodeURIComponent(province)}?page=${page}`;
+                    pageTitle.textContent = `${province} 地区商品`;
+                }
+                if (sort) {
+                    apiEndpoint += `&sort=${encodeURIComponent(sort)}`;
+                }
+            }
+
+            async function loadProducts() {
+                try {
+                    const response = await fetch(apiEndpoint);
+                    if (!response.ok) throw new Error('Failed to load products');
+                    const data = await response.json();
+                    renderProducts(data.content);
+                    renderPagination(data);
+                } catch (error) {
+                    console.error(error);
+                    productListContainer.innerHTML = '<p class="text-danger">加载商品失败。</p>';
+                }
+            }
+            
+            function renderProducts(products) {
+                if (!products || products.length === 0) {
+                    productListContainer.innerHTML = '<p>没有找到相关商品。</p>';
+                    return;
+                }
+                productListContainer.innerHTML = '';
+                products.forEach(product => {
+                    productListContainer.innerHTML += `
+                        <div class="col">
+                            <div class="card h-100">
+                                <img src="${product.imageUrls || (window.placeholderGenerator ? window.placeholderGenerator.generateProductPlaceholder(300, 200, product.name) : 'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22300%22%20height%3D%22200%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20fill%3D%22%23165DFF%22%2F%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20font-family%3D%22Arial%2C%20sans-serif%22%20font-size%3D%2216%22%20fill%3D%22%23FFFFFF%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22middle%22%3E商品图片%3C%2Ftext%3E%3C%2Fsvg%3E')}" class="card-img-top" alt="${product.name}">
+                                <div class="card-body">
+                                    <h5 class="card-title">${product.name}</h5>
+                                    <p class="card-text">
+                                        <span class="rating-stars">${renderStars(product.averageRating)}</span>
+                                        <span class="text-muted small">(${product.averageRating.toFixed(1)})</span>
+                                    </p>
+                                    <a href="detail.html?id=${product.id}" class="btn btn-primary btn-sm">查看详情</a>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            function renderPagination(pageData) {
+                paginationContainer.innerHTML = '';
+                if (pageData.totalPages <= 1) return;
+
+                paginationContainer.innerHTML += `
+                    <li class="page-item ${pageData.first ? 'disabled' : ''}">
+                        <a class="page-link" href="${buildPageUrl(pageData.number - 1)}">上一页</a>
+                    </li>
+                `;
+                for (let i = 0; i < pageData.totalPages; i++) {
+                    paginationContainer.innerHTML += `
+                        <li class="page-item ${i === pageData.number ? 'active' : ''}">
+                            <a class="page-link" href="${buildPageUrl(i)}">${i + 1}</a>
+                        </li>
+                    `;
+                }
+                paginationContainer.innerHTML += `
+                     <li class="page-item ${pageData.last ? 'disabled' : ''}">
+                        <a class="page-link" href="${buildPageUrl(pageData.number + 1)}">下一页</a>
+                    </li>
+                `;
+            }
+
+            function buildPageUrl(pageNum) {
+                const params = new URLSearchParams(window.location.search);
+                params.set('page', pageNum);
+                return `list.html?${params.toString()}`;
+            }
+
+            if (defaultRegionSelector && province) {
+                defaultRegionSelector.setSelectedRegions('#regionProvince', '#regionCity', '#regionArea', {
+                    province: province,
+                    city: city || '',
+                    area: area || ''
+                });
+            }
+
+            function renderStars(rating) {
+                let stars = '';
+                const fullStars = Math.floor(rating);
+                for (let i = 0; i < fullStars; i++) stars += '<i class="fa-solid fa-star"></i>';
+                if (rating % 1 >= 0.5) stars += '<i class="fa-solid fa-star-half-stroke"></i>';
+                const emptyStars = 5 - Math.ceil(rating);
+                for (let i = 0; i < emptyStars; i++) stars += '<i class="fa-regular fa-star"></i>';
+                return stars;
+            }
+
+            const searchForm = document.getElementById('search-form');
+            if (searchForm) {
+                searchForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const searchInput = searchForm.querySelector('input');
+                    const searchQuery = searchInput.value.trim();
+                    if (searchQuery) {
+                        window.location.href = `/product/list.html?searchQuery=${encodeURIComponent(searchQuery)}`;
+                    }
+                });
+            }
+
+            loadProducts();
+        });
+    </script>
+</body>
+</html>

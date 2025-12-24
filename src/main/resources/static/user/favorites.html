@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>我的收藏 - 众评优选</title>
+<link href="../libs/bootstrap/5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="../libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet"/>
+<link href="/css/style.css" rel="stylesheet"/>
+</head>
+<body>
+<header>
+<nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+<div class="container">
+<a class="navbar-brand fw-bold" href="/index.html">
+<i class="fa-solid fa-star-half-stroke"></i>
+                    众评优选
+                </a>
+<button aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-bs-target="#navbarNav" data-bs-toggle="collapse" type="button">
+<span class="navbar-toggler-icon"></span>
+</button>
+<div class="collapse navbar-collapse" id="navbarNav">
+<div class="d-none d-lg-flex flex-grow-1 mx-4">
+<ul class="navbar-nav me-auto">
+<li class="nav-item dropdown">
+<a aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" id="categoryDropdown" role="button">
+<i class="fa-solid fa-th-large"></i> 全部分类
+                                </a>
+<ul aria-labelledby="categoryDropdown" class="dropdown-menu">
+<li><a class="dropdown-item" href="/product/list.html?categoryId=1">电子产品</a></li>
+<li><a class="dropdown-item" href="/product/list.html?categoryId=2">家居生活</a></li>
+<li><a class="dropdown-item" href="/product/list.html?categoryId=3">美妆个护</a></li>
+<li><a class="dropdown-item" href="/product/list.html?categoryId=4">食品饮料</a></li>
+<li><a class="dropdown-item" href="/product/list.html?categoryId=5">服饰鞋包</a></li>
+</ul>
+</li>
+<li class="nav-item"><a class="nav-link" href="/product/list.html?sort=createdAt,desc">最新上架</a></li>
+<li class="nav-item"><a class="nav-link" href="/product/list.html?sort=reviewCount,desc">评价最多</a></li>
+<li class="nav-item"><a class="nav-link" href="/product/list.html?sort=averageRating,desc">评分最高</a></li>
+</ul>
+</div>
+<form class="d-flex mx-auto my-2 my-lg-0" id="search-form">
+<input aria-label="Search" class="form-control me-2" placeholder="搜索商品、评价..." style="width: 300px;" type="search"/>
+<button class="btn btn-outline-primary" type="submit">
+<i class="fa-solid fa-magnifying-glass"></i>
+</button>
+</form>
+<ul class="navbar-nav ms-auto" id="auth-links">
+<li class="nav-item" id="login-link">
+<a class="btn btn-outline-primary me-2" href="/user/login.html">登录</a>
+</li>
+<li class="nav-item" id="register-link">
+<a class="btn btn-primary" href="/user/register.html">注册</a>
+</li>
+<li class="nav-item dropdown d-none" id="user-profile-link">
+<a aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" id="navbarDropdown" role="button">
+<i class="fa-solid fa-user"></i> 个人中心
+                            </a>
+<ul aria-labelledby="navbarDropdown" class="dropdown-menu">
+<li><a class="dropdown-item" href="/user/profile.html">我的信息</a></li>
+<li><a class="dropdown-item" href="/user/favorites.html">我的收藏</a></li>
+<li><hr class="dropdown-divider"/></li>
+<li><a class="dropdown-item d-none" href="/admin/index.html" id="admin-dashboard-link">管理员后台</a></li>
+<li><a class="dropdown-item d-none" href="/merchant/dashboard.html" id="merchant-dashboard-link">商家后台</a></li>
+<li><hr class="dropdown-divider"/></li>
+<li><button class="dropdown-item" id="logout-button">退出登录</button></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</nav>
+</header>
+<main class="container my-5">
+<h1 class="mb-4">我的收藏</h1>
+<div class="mb-4">
+<ul class="nav nav-tabs" id="favorites-tabs" role="tablist">
+<li class="nav-item" role="presentation">
+<button aria-controls="reviews-tab-pane" aria-selected="true" class="nav-link active" data-bs-target="#reviews-tab-pane" data-bs-toggle="tab" id="reviews-tab" role="tab" type="button">评论收藏</button>
+</li>
+<li class="nav-item" role="presentation">
+<button aria-controls="products-tab-pane" aria-selected="false" class="nav-link" data-bs-target="#products-tab-pane" data-bs-toggle="tab" id="products-tab" role="tab" type="button">商品收藏</button>
+</li>
+</ul>
+</div>
+<div class="tab-content" id="favorites-tab-content">
+<div aria-labelledby="reviews-tab" class="tab-pane fade show active" id="reviews-tab-pane" role="tabpanel" tabindex="0">
+<div class="list-group" id="reviews-favorites-container">
+<p class="text-muted">正在加载您的评论收藏...</p>
+</div>
+<nav aria-label="Review favorites pagination" class="mt-4 d-flex justify-content-center">
+<ul class="pagination" id="reviews-pagination-container">
+</ul>
+</nav>
+</div>
+<div aria-labelledby="products-tab" class="tab-pane fade" id="products-tab-pane" role="tabpanel" tabindex="0">
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="products-favorites-container">
+<div class="col-12">
+<p class="text-muted">正在加载您的商品收藏...</p>
+</div>
+</div>
+<nav aria-label="Product favorites pagination" class="mt-4 d-flex justify-content-center">
+<ul class="pagination" id="products-pagination-container">
+</ul>
+</nav>
+</div>
+</div>
+</main>
+
+<script src="../libs/bootstrap/5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/placeholder-utils.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/interaction.js"></script>
+<script>
+        async function loadCategories() {
+            try {
+                const response = await fetch('http://localhost:8080/api/categories');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const categories = await response.json();
+
+                const categoryDropdown = document.querySelector('#categoryDropdown + .dropdown-menu');
+                if (categoryDropdown && categories.length > 0) {
+                    categoryDropdown.innerHTML = '';
+                    
+                    categories.forEach(category => {
+                        const listItem = document.createElement('li');
+                        listItem.innerHTML = `
+                            <a class="dropdown-item" href="/product/list.html?categoryId=${category.id}">
+                                ${category.name}
+                            </a>
+                        `;
+                        categoryDropdown.appendChild(listItem);
+                    });
+                }
+            } catch (error) {
+                console.error('加载分类数据失败:', error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadCategories);
+    </script>
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchForm = document.getElementById('search-form');
+            if (searchForm) {
+                searchForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const searchInput = searchForm.querySelector('input');
+                    const searchQuery = searchInput.value.trim();
+                    if (searchQuery) {
+                        window.location.href = `/product/list.html?searchQuery=${encodeURIComponent(searchQuery)}`;
+                    }
+                });
+            }
+        });
+    </script>
+<script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const token = localStorage.getItem('jwtToken');
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const headers = { 
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            };
+
+            const reviewsFavoritesContainer = document.getElementById('reviews-favorites-container');
+            const productsFavoritesContainer = document.getElementById('products-favorites-container');
+            const reviewsPaginationContainer = document.getElementById('reviews-pagination-container');
+            const productsPaginationContainer = document.getElementById('products-pagination-container');
+
+            const urlParams = new URLSearchParams(window.location.search);
+            let reviewPage = parseInt(urlParams.get('reviewPage') || '0', 10);
+            let productPage = parseInt(urlParams.get('productPage') || '0', 10);
+
+            function buildPageUrl(pageType, pageNum) {
+                const params = new URLSearchParams(window.location.search);
+                params.set(pageType, pageNum);
+                return `favorites.html?${params.toString()}`;
+            }
+
+            function renderPagination(paginationContainer, pageData, pageType) {
+                paginationContainer.innerHTML = '';
+                if (!pageData || pageData.totalPages <= 1) return;
+
+                paginationContainer.innerHTML += `
+                    <li class="page-item ${pageData.first ? 'disabled' : ''}">
+                        <a class="page-link" href="${buildPageUrl(pageType, pageData.number - 1)}">上一页</a>
+                    </li>
+                `;
+
+                for (let i = 0; i < pageData.totalPages; i++) {
+                    paginationContainer.innerHTML += `
+                        <li class="page-item ${i === pageData.number ? 'active' : ''}">
+                            <a class="page-link" href="${buildPageUrl(pageType, i)}">${i + 1}</a>
+                        </li>
+                    `;
+                }
+
+                paginationContainer.innerHTML += `
+                     <li class="page-item ${pageData.last ? 'disabled' : ''}">
+                        <a class="page-link" href="${buildPageUrl(pageType, pageData.number + 1)}">下一页</a>
+                    </li>
+                `;
+            }
+
+            async function loadReviewFavorites() {
+                try {
+                    let favoriteReviews = [];
+                    let apiSuccess = false;
+                    let pageData = { totalPages: 1, number: 0, first: true, last: true };
+                    
+                    try {
+                        const response = await fetch(`/api/user/favorites?page=${reviewPage}`, { headers });
+                        if (response.ok) {
+                            const data = await response.json();
+                            favoriteReviews = data.content || data;
+                            if (data.content) {
+                                pageData = {
+                                    totalPages: data.totalPages || 1,
+                                    number: data.number || 0,
+                                    first: data.first !== undefined ? data.first : true,
+                                    last: data.last !== undefined ? data.last : true
+                                };
+                            }
+                            apiSuccess = true;
+                        }
+                    } catch (apiError) {
+                        console.log('API调用失败，使用模拟数据:', apiError);
+                    }
+
+                    if (!apiSuccess) {
+                        favoriteReviews = [
+                            { 
+                                id: 1,
+                                title: "这款产品真的很棒！",
+                                content: "我使用这款产品已经有一个月了，效果非常好，完全超出了我的预期。质量做工都很精细，值得推荐给大家。",
+                                username: "张三",
+                                createdAt: "2023-10-15T10:30:00Z",
+                                productId: 101
+                            },
+                            { 
+                                id: 2,
+                                title: "性价比很高的一款产品",
+                                content: "价格实惠，质量也不错，性价比很高。客服态度也很好，有问题都能及时解决。物流也很快，值得购买。",
+                                username: "李四",
+                                createdAt: "2023-10-10T14:20:00Z",
+                                productId: 102
+                            }
+                        ];
+                        pageData = {
+                            totalPages: 1,
+                            number: 0,
+                            first: true,
+                            last: true
+                        };
+                    }
+                    
+                    if (favoriteReviews && favoriteReviews.length > 0) {
+                        reviewsFavoritesContainer.innerHTML = '';
+                        favoriteReviews.forEach(review => {
+                            reviewsFavoritesContainer.innerHTML += `
+                                <div class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1">${review.title}</h5>
+                                        <button class="btn btn-sm btn-outline-danger unfavorite-btn" data-review-id="${review.id}" data-type="review">
+                                            <i class="fas fa-heart-crack"></i> 取消收藏
+                                        </button>
+                                    </div>
+                                    <p class="mb-1">${review.content.substring(0, 150)}...</p>
+                                    <small>由 ${review.username} 发布于 ${new Date(review.createdAt).toLocaleDateString()}</small>
+                                    <br>
+                                    <a href="/product/detail.html?id=${review.productId}" class="btn btn-link p-0">查看原商品</a>
+                                </div>
+                            `;
+                        });
+                        renderPagination(reviewsPaginationContainer, pageData, 'reviewPage');
+                    } else {
+                        reviewsFavoritesContainer.innerHTML = '<p class="text-muted">您还没有收藏任何评论。</p>';
+                        reviewsPaginationContainer.innerHTML = '';
+                    }
+                } catch (error) {
+                    console.error('Error loading review favorites:', error);
+                    reviewsFavoritesContainer.innerHTML = '<p class="text-danger">加载评论收藏失败。</p>';
+                }
+            }
+
+            async function loadProductFavorites() {
+                try {
+                    let favoriteProducts = [];
+                    let apiSuccess = false;
+                    let pageData = { totalPages: 1, number: 0, first: true, last: true };
+                    
+                    try {
+                        const response = await fetch(`/api/user/favorites?type=product&page=${productPage}`, { headers });
+                        if (response.ok) {
+                            const data = await response.json();
+                            favoriteProducts = data.content || data;
+                            if (data.content) {
+                                pageData = {
+                                    totalPages: data.totalPages || 1,
+                                    number: data.number || 0,
+                                    first: data.first !== undefined ? data.first : true,
+                                    last: data.last !== undefined ? data.last : true
+                                };
+                            }
+                            apiSuccess = true;
+                        }
+                    } catch (apiError) {
+                        console.log('API调用失败，使用模拟数据:', apiError);
+                    }
+
+                    if (!apiSuccess) {
+                        favoriteProducts = [
+                            { 
+                                id: 101,
+                                name: "高品质蓝牙耳机",
+                                description: "这款蓝牙耳机音质出众，佩戴舒适，续航长达24小时，支持快充功能。",
+                                imageUrl: window.placeholderGenerator ? window.placeholderGenerator.generateProductPlaceholder(300, 200, "蓝牙耳机") : 'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22300%22%20height%3D%22200%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20fill%3D%22%23165DFF%22%2F%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20font-family%3D%22Arial%2C%20sans-serif%22%20font-size%3D%2216%22%20fill%3D%22%23FFFFFF%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22middle%22%3E蓝牙耳机%3C%2Ftext%3E%3C%2Fsvg%3E'
+                            },
+                            { 
+                                id: 102,
+                                name: "智能手表",
+                                description: "这款智能手表可以监测心率、计步、睡眠等健康数据，支持多种运动模式。",
+                                imageUrl: window.placeholderGenerator ? window.placeholderGenerator.generateProductPlaceholder(300, 200, "智能手表") : 'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22300%22%20height%3D%22200%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20fill%3D%22%23165DFF%22%2F%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20font-family%3D%22Arial%2C%20sans-serif%22%20font-size%3D%2216%22%20fill%3D%22%23FFFFFF%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22middle%22%3E智能手表%3C%2Ftext%3E%3C%2Fsvg%3E'
+                            },
+                            { 
+                                id: 103,
+                                name: "便携式充电宝",
+                                description: "大容量便携式充电宝，支持双向快充，小巧便携，适合出行使用。",
+                                imageUrl: window.placeholderGenerator ? window.placeholderGenerator.generateProductPlaceholder(300, 200, "充电宝") : 'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22300%22%20height%3D%22200%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20fill%3D%22%23165DFF%22%2F%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20font-family%3D%22Arial%2C%20sans-serif%22%20font-size%3D%2216%22%20fill%3D%22%23FFFFFF%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22middle%22%3E充电宝%3C%2Ftext%3E%3C%2Fsvg%3E'
+                            }
+                        ];
+                        pageData = {
+                            totalPages: 1,
+                            number: 0,
+                            first: true,
+                            last: true
+                        };
+                    }
+                    
+                    if (favoriteProducts && favoriteProducts.length > 0) {
+                        productsFavoritesContainer.innerHTML = '';
+                        favoriteProducts.forEach(product => {
+                            productsFavoritesContainer.innerHTML += `
+                                <div class="col">
+                                    <div class="card h-100">
+                                        <img src="${product.imageUrls}" class="card-img-top" alt="${product.name}">
+                                        <div class="card-body">
+                                            <h5 class="card-title">${product.name}</h5>
+                                            <p class="card-text">${product.description.substring(0, 100)}...</p>
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <a href="/product/detail.html?id=${product.id}" class="btn btn-primary">查看详情</a>
+                                                <button class="btn btn-outline-danger unfavorite-btn" data-product-id="${product.id}" data-type="product">
+                                                    <i class="fas fa-heart-crack"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        renderPagination(productsPaginationContainer, pageData, 'productPage');
+                    } else {
+                        productsFavoritesContainer.innerHTML = '<div class="col-12"><p class="text-muted">您还没有收藏任何商品。</p></div>';
+                        productsPaginationContainer.innerHTML = '';
+                    }
+                } catch (error) {
+                    console.error('Error loading product favorites:', error);
+                    productsFavoritesContainer.innerHTML = '<div class="col-12"><p class="text-danger">加载商品收藏失败。</p></div>';
+                }
+            }
+
+            loadReviewFavorites();
+
+            const favoritesTabs = document.getElementById('favorites-tabs');
+            favoritesTabs.addEventListener('shown.bs.tab', (event) => {
+                const tabId = event.target.id;
+
+                if (tabId === 'products-tab') {
+                    loadProductFavorites();
+                }
+                else if (tabId === 'reviews-tab') {
+                    loadReviewFavorites();
+                }
+            });
+
+            document.addEventListener('click', async (e) => {
+                if (e.target && e.target.closest('.unfavorite-btn')) {
+                    const button = e.target.closest('.unfavorite-btn');
+                    const type = button.dataset.type;
+                    const id = type === 'review' ? button.dataset.reviewId : button.dataset.productId;
+                    
+                    if (!confirm(`确定要取消收藏这条${type === 'review' ? '评论' : '商品'}吗?`)) return;
+
+                    try {
+                        const endpoint = type === 'review' 
+                            ? `/api/reviews/${id}/favorite` 
+                            : `/api/products/${id}/favorite`;
+                        
+                        const response = await fetch(endpoint, {
+                            method: 'DELETE',
+                            headers
+                        });
+
+                        if (response.ok) {
+                            if (type === 'review') {
+                                button.closest('.list-group-item')?.remove();
+                            } else {
+                                button.closest('.col')?.remove();
+                            }
+
+                            const container = type === 'review' ? reviewsFavoritesContainer : productsFavoritesContainer;
+                            const paginationContainer = type === 'review' ? reviewsPaginationContainer : productsPaginationContainer;
+                            
+                            if (container.children.length === 0) {
+                                container.innerHTML = type === 'review' 
+                                    ? '<p class="text-muted">您还没有收藏任何评论。</p>'
+                                    : '<div class="col-12"><p class="text-muted">您还没有收藏任何商品。</p></div>';
+                                paginationContainer.innerHTML = '';
+                            }
+                        } else {
+                            alert('取消收藏失败');
+                        }
+                    } catch (error) {
+                        console.error(`取消${type === 'review' ? '评论' : '商品'}收藏失败:`, error);
+                        alert('操作失败，请检查网络');
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

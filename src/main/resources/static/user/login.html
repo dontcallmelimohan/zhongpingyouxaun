@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>登录 - 众评优选</title>
+<link href="../libs/bootstrap/5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="../libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+<link href="/css/style.css" rel="stylesheet"/>
+<style>
+        body, html { height: 100%; }
+        .login-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(100vh - 120px);
+        }
+    </style>
+</link></head>
+<body>
+<header>
+<nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+<div class="container">
+<a class="navbar-brand fw-bold" href="/index.html">
+<i class="fa-solid fa-star-half-stroke"></i>
+                    众评优选
+                </a>
+</div>
+</nav>
+</header>
+<main class="login-container">
+<div class="col-md-5 col-lg-4">
+<div class="card shadow-lg">
+<div class="card-body p-4 p-md-5">
+<h2 class="card-title text-center mb-4">欢迎回来</h2>
+<form id="loginForm">
+<div class="form-floating mb-3">
+<input class="form-control" id="username" placeholder="用户名" required="" type="text"/>
+<label for="username">用户名</label>
+</div>
+<div class="form-floating mb-3">
+<input class="form-control" id="password" placeholder="密码" required="" type="password"/>
+<label for="password">密码</label>
+</div>
+<div class="d-grid">
+<button class="btn btn-primary btn-lg" type="submit">登录</button>
+</div>
+<div class="alert alert-danger mt-3 d-none" id="errorMessage" role="alert"></div>
+</form>
+<hr class="my-4"/>
+<div class="text-center">
+<p class="mb-0">还没有账户? <a href="register.html">立即注册</a></p>
+</div>
+</div>
+</div>
+</div>
+</main>
+
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const jwtToken = localStorage.getItem('jwtToken');
+            const userJson = localStorage.getItem('user');
+            
+            if (jwtToken) {
+              const userInfo = userJson ? JSON.parse(userJson) : null;
+
+              if (userInfo && userInfo.roles && !userInfo.roles.includes('ROLE_ADMIN') && !userInfo.roles.includes('ROLE_MERCHANT')) {
+                window.location.href = '/index.html';
+                return;
+              }
+
+              if (userInfo && userInfo.roles && userInfo.roles.includes('ROLE_MERCHANT')) {
+                localStorage.removeItem('jwtToken');
+                localStorage.removeItem('user');
+              }
+
+              if (userInfo && userInfo.roles && userInfo.roles.includes('ROLE_ADMIN')) {
+                localStorage.removeItem('jwtToken');
+                localStorage.removeItem('user');
+              }
+            }
+
+            const loginForm = document.getElementById('loginForm');
+            const errorMessageDiv = document.getElementById('errorMessage');
+
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                errorMessageDiv.classList.add('d-none');
+
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+
+                try {
+                    const response = await fetch('/api/auth/signin', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username, password })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        localStorage.setItem('jwtToken', data.token);
+                        localStorage.setItem('user', JSON.stringify({
+                            username: data.username,
+                            email: data.email,
+                            roles: data.roles
+                        }));
+                        window.location.href = '/index.html';
+                    } else {
+                        errorMessageDiv.textContent = data.message || '用户名或密码无效。';
+                        errorMessageDiv.classList.remove('d-none');
+                    }
+                } catch (error) {
+                    errorMessageDiv.textContent = '网络错误，请稍后重试。';
+                    errorMessageDiv.classList.remove('d-none');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
