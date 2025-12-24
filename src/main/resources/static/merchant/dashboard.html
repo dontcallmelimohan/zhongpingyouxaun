@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>商家后台 - 众评优选</title>
+<link href="../libs/bootstrap/5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="../libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet"/>
+<script src="../libs/chart.js/4.4.8/dist/chart.umd.min.js"></script>
+<link href="../libs/admin-lte/3.2.0/dist/css/adminlte.min.css" rel="stylesheet"/>
+<script src="js/merchant-auth.js"></script>
+<script src="/js/placeholder-utils.js"></script>
+<style>
+        .content-wrapper {
+            background-color: #f8f9fa;
+        }
+        .card-header {
+            background-color: #ffffff;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        .small-box {
+            border-radius: 0.5rem;
+            transition: transform 0.2s;
+        }
+        .small-box:hover {
+            transform: translateY(-5px);
+        }
+        .small-box-icon {
+            border-radius: 0.5rem 0 0 0.5rem;
+        }
+        .info-box {
+            border-radius: 0.5rem;
+        }
+        .sidebar-dark-primary {
+            background-color: #343a40;
+        }
+        .nav-link.active {
+            background-color: rgba(255,255,255,0.2);
+        }
+    </style>
+</head>
+<body class="hold-transition sidebar-mini">
+<div class="wrapper">
+<nav class="main-header navbar navbar-expand navbar-white navbar-light">
+<ul class="navbar-nav">
+<li class="nav-item">
+<a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fa fa-bars"></i></a>
+</li>
+</ul>
+<ul class="navbar-nav ml-auto">
+<li class="nav-item">
+<a class="nav-link" href="/index.html" role="button">
+<i class="fa fa-home mr-1"></i> 返回首页
+                    </a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="#" id="logoutButton">
+<i class="fa fa-sign-out mr-1"></i> 退出登录
+                    </a>
+</li>
+<li class="nav-item dropdown user-menu">
+<a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#">
+<i class="fa fa-user-circle mr-2" style="font-size: 20px;"></i>
+<span class="d-none d-md-inline" id="merchantName">商家名称</span>
+</a>
+<div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+<a class="dropdown-item" href="profile.html">
+<i class="fa fa-user mr-2"></i> 个人资料
+                        </a>
+<a class="dropdown-item" href="#">
+<i class="fa fa-cog mr-2"></i> 设置
+                        </a>
+</div>
+</li>
+</ul>
+</nav>
+<aside class="main-sidebar sidebar-dark-primary elevation-4">
+<a class="brand-link" href="dashboard.html">
+<i class="fa fa-store mr-2" style="font-size: 24px;"></i>
+<span class="brand-text font-weight-light">众评优选商家后台</span>
+</a>
+<div class="sidebar">
+<div class="user-panel mt-3 pb-3 mb-3 d-flex">
+<div class="image">
+<i class="fa fa-user-circle text-white" style="font-size: 32px;"></i>
+</div>
+<div class="info">
+<a class="d-block" href="profile.html" id="sidebar-merchant-name">商家名称</a>
+</div>
+</div>
+<nav class="mt-2">
+<ul class="nav nav-pills nav-sidebar flex-column" data-accordion="false" data-widget="treeview" role="menu">
+<li class="nav-item">
+<a class="nav-link active" href="dashboard.html">
+<i class="nav-icon fa fa-dashboard"></i>
+<p>仪表盘</p>
+</a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="products.html">
+<i class="nav-icon fa fa-shopping-bag"></i>
+<p>商品管理</p>
+</a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="reviews.html">
+<i class="nav-icon fa fa-comment"></i>
+<p>评价管理</p>
+</a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="profile.html">
+<i class="nav-icon fa fa-user"></i>
+<p>商家设置</p>
+</a>
+</li>
+</ul>
+</nav>
+</div>
+</aside>
+<div class="content-wrapper">
+<div class="content-header">
+<div class="container-fluid">
+<div class="row mb-2">
+<div class="col-sm-6">
+<h1 class="m-0">仪表盘</h1>
+</div>
+</div>
+</div>
+</div>
+<div class="content">
+<div class="container-fluid">
+<div class="row">
+<div class="col-lg-4 col-12">
+<div class="small-box bg-info">
+<div class="inner">
+<h3 id="totalProducts">0</h3>
+<p>商品总数</p>
+</div>
+<div class="icon">
+<i class="fa fa-shopping-bag"></i>
+</div>
+<a class="small-box-footer" href="products.html">查看详情 <i class="fa fa-arrow-circle-right"></i></a>
+</div>
+</div>
+<div class="col-lg-4 col-12">
+<div class="small-box bg-warning">
+<div class="inner">
+<h3 id="totalReviews">0</h3>
+<p>评价总数</p>
+</div>
+<div class="icon">
+<i class="fa fa-comment"></i>
+</div>
+<a class="small-box-footer" href="reviews.html">查看详情 <i class="fa fa-arrow-circle-right"></i></a>
+</div>
+</div>
+<div class="col-lg-4 col-12">
+<div class="small-box bg-danger">
+<div class="inner">
+<h3 id="pendingReviews">0</h3>
+<p>待回复评价</p>
+</div>
+<div class="icon">
+<i class="fa fa-exclamation-circle"></i>
+</div>
+<a class="small-box-footer" href="reviews.html">查看详情 <i class="fa fa-arrow-circle-right"></i></a>
+</div>
+</div>
+</div>
+<div class="row">
+<div class="col-12">
+<div class="card">
+<div class="card-header">
+<h3 class="card-title">热门商品</h3>
+</div>
+<div class="card-body">
+<ul class="products-list product-list-in-card pl-2 pr-2" id="popularProductsList">
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script src="../libs/jquery/3.7.1/dist/jquery.min.js"></script>
+<script src="../libs/bootstrap/5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../libs/chart.js/4.4.8/dist/chart.umd.min.js"></script>
+<script src="../libs/admin-lte/3.2.0/dist/js/adminlte.min.js"></script>
+<script>
+        const initDashboard = function() {
+            console.log('开始初始化商家仪表盘');
+
+            const token = localStorage.getItem('jwtToken');
+
+            console.log('Token长度:', token ? token.length : '无');
+
+            const HEADERS = {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            };
+            
+            console.log('请求头设置:', {
+                'Authorization': 'Bearer [已隐藏]',
+                'Content-Type': 'application/json'
+            });
+
+            function showErrorMessage(message) {
+                console.error('错误:', message);
+            }
+
+            async function fetchRealData() {
+                try {
+                    console.log('开始获取商家商品数据...');
+
+                    const productsResponse = await fetch('http://localhost:8080/api/products/my-products?size=1000', {
+                        headers: HEADERS
+                    });
+                    
+                    if (productsResponse.ok) {
+                        const productsData = await productsResponse.json();
+                        const products = productsData.content || productsData;
+                        console.log('获取到的商品数据:', products);
+
+                        const totalProducts = products.length;
+                        document.getElementById('totalProducts').textContent = totalProducts;
+
+                        console.log('开始获取商家评价数据...');
+                        const reviewsResponse = await fetch('http://localhost:8080/api/reviews/merchant?size=1000', {
+                            headers: HEADERS
+                        });
+                        
+                        if (reviewsResponse.ok) {
+                            const reviewsData = await reviewsResponse.json();
+                            const reviews = reviewsData.content || reviewsData;
+                            console.log('获取到的评价数据:', reviews);
+
+                            const totalReviews = reviews.length;
+                            document.getElementById('totalReviews').textContent = totalReviews;
+
+                            const pendingReviews = reviews.filter(review => review.responseStatus === 'PENDING').length;
+                            document.getElementById('pendingReviews').textContent = pendingReviews;
+
+                            const repliedReviews = reviews.filter(review => review.responseStatus === 'REPLIED').length;
+                            
+                            console.log('评价总数:', reviews.length, '待回复:', pendingReviews, '已回复:', repliedReviews);
+
+                            window.dashboardReviewsData = reviews;
+
+                            const productReviewCounts = {};
+                            reviews.forEach(review => {
+                                if (review.productId) {
+                                    productReviewCounts[review.productId] = (productReviewCounts[review.productId] || 0) + 1;
+                                }
+                            });
+
+                            const productsWithReviews = products.map(product => ({
+                                ...product,
+                                reviewCount: productReviewCounts[product.id] || 0
+                            }));
+
+                            const popularProducts = productsWithReviews
+                                .sort((a, b) => b.reviewCount - a.reviewCount)
+                                .slice(0, 3);
+                            
+                            console.log('热门商品:', popularProducts);
+                            renderPopularProducts(popularProducts);
+                            
+                        } else {
+                            console.error('获取评价数据失败:', reviewsResponse.status);
+                            throw new Error('获取评价数据失败');
+                        }
+                    } else {
+                        console.error('获取商品数据失败:', productsResponse.status);
+                        throw new Error('获取商品数据失败');
+                    }
+                    
+                } catch (error) {
+                    console.error('获取真实数据失败:', error);
+                    throw error;
+                }
+            }
+
+            async function initDashboardData() {
+                console.log('开始初始化仪表盘数据...');
+                try {
+                    console.log('权限验证已通过，开始获取真实数据...');
+                    await fetchRealData();
+                    
+                    console.log('仪表盘数据初始化完成');
+                } catch (error) {
+                    console.error('初始化仪表盘数据异常:', error);
+
+                    showErrorMessage('网络连接异常，无法加载最新数据');
+
+                    renderMockData();
+                }
+            }
+
+            initDashboardData();
+        }
+
+        initMerchantPage(initDashboard);
+
+        window.refreshPendingReviewsCount = async function() {
+            try {
+                console.log('开始刷新待回复评价数量...');
+
+                const token = localStorage.getItem('jwtToken');
+                const HEADERS = {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                };
+
+                if (!token) {
+                    console.log('Token不存在，无法刷新待回复评价数量');
+                    return false;
+                }
+
+                if (token.split('.').length !== 3) {
+                    console.log('Token格式无效');
+                    return false;
+                }
+
+                const reviewsResponse = await fetch('http://localhost:8080/api/reviews/merchant?size=1000', {
+                    headers: HEADERS
+                });
+                
+                if (reviewsResponse.ok) {
+                    const reviewsData = await reviewsResponse.json();
+                    const reviews = reviewsData.content || reviewsData;
+
+                    const pendingReviews = reviews.filter(review => review.responseStatus === 'PENDING').length;
+                    document.getElementById('pendingReviews').textContent = pendingReviews;
+
+                    document.getElementById('totalReviews').textContent = reviews.length;
+
+                    const repliedReviews = reviews.filter(review => review.responseStatus === 'REPLIED').length;
+
+                    window.dashboardReviewsData = reviews;
+                    
+                    console.log('评价总数:', reviews.length, '待回复:', pendingReviews, '已回复:', repliedReviews);
+                    console.log('待回复评价数量已刷新，当前数量:', pendingReviews);
+                    return true;
+                } else {
+                    console.error('刷新待回复评价数量失败:', reviewsResponse.status);
+                    return false;
+                }
+            } catch (error) {
+                console.error('刷新待回复评价数量异常:', error);
+                return false;
+            }
+        }
+
+        function renderPopularProducts(products) {
+            const container = document.getElementById('popularProductsList');
+            if (products.length === 0) {
+                container.innerHTML = '<p class="text-center text-muted">暂无商品数据</p>';
+                return;
+            }
+            
+            container.innerHTML = '';
+            products.forEach((product, index) => {
+                const item = document.createElement('li');
+                item.className = 'item';
+                item.innerHTML = `
+                    <div class="product-img">
+                        <i class="fa fa-shopping-bag" style="font-size: 40px; color: #165DFF;"></i>
+                    </div>
+                    <div class="product-info">
+                        <a href="#" class="product-title">${product.name || '未知商品'}
+                            <span class="badge badge-success float-right">评价: ${product.reviewCount || 0}</span>
+                        </a>
+                        <span class="product-description">
+                            评价数量: ${product.reviewCount || 0}
+                        </span>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+        
+
+        
+
+
+        function renderMockData() {
+            document.getElementById('totalProducts').textContent = '12';
+            document.getElementById('totalReviews').textContent = '34';
+            document.getElementById('pendingReviews').textContent = '3';
+
+            const mockProducts = [
+                { name: '精选水果礼盒', reviewCount: 120 },
+                { name: '有机蔬菜组合', reviewCount: 95 },
+                { name: '新鲜奶制品', reviewCount: 80 }
+            ];
+            renderPopularProducts(mockProducts);
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return null;
+            const date = new Date(dateString);
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            return `${year}-${month}-${day} ${hours}:${minutes}`;
+        }
+    </script>
+</body>
+</html>

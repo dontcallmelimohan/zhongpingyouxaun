@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>众评优选 | 管理后台登录</title>
+<link href="../libs/bootstrap/5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="../libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet"/>
+<link href="../libs/admin-lte/3.2.0/dist/css/adminlte.min.css" rel="stylesheet"/>
+<link href="css/admin.css" rel="stylesheet"/>
+</head>
+<body class="hold-transition login-page">
+<div class="login-box">
+<div class="login-logo">
+<a href="index.html"><b>众评优选</b>管理后台</a>
+</div>
+<div class="card">
+<div class="card-body login-card-body">
+<p class="login-box-msg">请登录以开始您的会话</p>
+<form id="loginForm">
+<div class="input-group mb-3">
+<input class="form-control" id="username" placeholder="用户名" required="" type="text"/>
+<div class="input-group-append">
+<div class="input-group-text">
+<span class="fas fa-user"></span>
+</div>
+</div>
+</div>
+<div class="input-group mb-3">
+<input class="form-control" id="password" placeholder="密码" required="" type="password"/>
+<div class="input-group-append">
+<div class="input-group-text">
+<span class="fas fa-lock"></span>
+</div>
+</div>
+</div>
+<div class="row">
+<div class="col-8">
+</div>
+<div class="col-4">
+<button class="btn btn-primary btn-block" type="submit">登录</button>
+</div>
+</div>
+</form>
+<div class="alert alert-danger mt-3 d-none" id="errorMessage" role="alert"></div>
+</div>
+</div>
+</div>
+<script src="../libs/jquery/3.7.1/dist/jquery.min.js"></script>
+<script src="../libs/bootstrap/5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../libs/admin-lte/3.2.0/dist/js/adminlte.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+
+    const jwtToken = localStorage.getItem('jwtToken');
+    const userJson = localStorage.getItem('user');
+    
+    if (jwtToken) {
+
+      const userInfo = userJson ? JSON.parse(userJson) : null;
+      
+
+      if (userInfo && userInfo.roles && userInfo.roles.includes('ROLE_ADMIN')) {
+        window.location.href = '/admin/index.html';
+        return;
+      }
+      
+
+      if (userInfo && userInfo.roles && userInfo.roles.includes('ROLE_MERCHANT')) {
+
+        localStorage.removeItem('jwtToken');
+        localStorage.removeItem('user');
+      }
+    }
+
+    const loginForm = document.getElementById('loginForm');
+    const errorMessageDiv = document.getElementById('errorMessage');
+
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+
+      try {
+        const response = await fetch('/api/auth/signin', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+
+          localStorage.setItem('jwtToken', data.token);
+
+          localStorage.setItem('user', JSON.stringify({
+            id: data.id,
+            username: data.username,
+            email: data.email,
+            roles: data.roles
+          }));
+
+
+          if (data.roles && data.roles.includes('ROLE_ADMIN')) {
+
+            window.location.href = '/admin/index.html';
+          } else {
+
+            window.location.href = '/index.html';
+          }
+        } else {
+
+          errorMessageDiv.textContent = data.message || '用户名或密码错误。';
+          errorMessageDiv.classList.remove('d-none');
+        }
+      } catch (error) {
+        console.error('Login error:', error);
+        errorMessageDiv.textContent = '登录请求失败，请检查网络或联系管理员。';
+        errorMessageDiv.classList.remove('d-none');
+      }
+    });
+  });
+</script>
+</body>
+</html>

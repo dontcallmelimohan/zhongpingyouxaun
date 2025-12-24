@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>商品管理 - 众评优选商家后台</title>
+<link href="../libs/bootstrap/5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="../libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet"/>
+<link href="../libs/datatables.net/1.13.6/css/jquery.dataTables.min.css" rel="stylesheet"/>
+<link href="../libs/datatables.net-bs5/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet"/>
+<link href="../libs/admin-lte/3.2.0/dist/css/adminlte.min.css" rel="stylesheet"/>
+<script src="js/merchant-auth.js"></script>
+<style>
+        .content-wrapper {
+            background-color: #f8f9fa;
+        }
+        .card-header {
+            background-color: #ffffff;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        .sidebar-dark-primary {
+            background-color: #343a40;
+        }
+        .product-image {
+            max-width: 80px;
+            max-height: 80px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .btn-primary {
+            background-color: #165DFF;
+            border-color: #165DFF;
+        }
+        .btn-primary:hover {
+            background-color: #0E42C0;
+            border-color: #0E42C0;
+        }
+        .btn-success {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+        .btn-success:hover {
+            background-color: #218838;
+            border-color: #218838;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+        .btn-danger:hover {
+            background-color: #c82333;
+            border-color: #c82333;
+        }
+    </style>
+</head>
+<body class="hold-transition sidebar-mini">
+<div class="wrapper">
+<nav class="main-header navbar navbar-expand navbar-white navbar-light">
+<ul class="navbar-nav">
+<li class="nav-item">
+<a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fa fa-bars"></i></a>
+</li>
+</ul>
+<ul class="navbar-nav ml-auto">
+<li class="nav-item">
+<a class="nav-link" href="/index.html" role="button">
+<i class="fa fa-home mr-1"></i> 返回首页
+                    </a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="#" id="logoutButton">
+<i class="fa fa-sign-out mr-1"></i> 退出登录
+                    </a>
+</li>
+<li class="nav-item dropdown user-menu">
+<a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#">
+<i class="fa fa-user-circle mr-2" style="font-size: 20px;"></i>
+<span class="d-none d-md-inline" id="merchantName">商家名称</span>
+</a>
+<div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+<a class="dropdown-item" href="profile.html">
+<i class="fa fa-user mr-2"></i> 个人资料
+                        </a>
+<a class="dropdown-item" href="#">
+<i class="fa fa-cog mr-2"></i> 设置
+                        </a>
+</div>
+</li>
+</ul>
+</nav>
+<aside class="main-sidebar sidebar-dark-primary elevation-4">
+<a class="brand-link" href="dashboard.html">
+<i class="fa fa-store mr-2" style="font-size: 24px;"></i>
+<span class="brand-text font-weight-light">众评优选商家后台</span>
+</a>
+<div class="sidebar">
+<div class="user-panel mt-3 pb-3 mb-3 d-flex">
+<div class="image">
+<i class="fa fa-user-circle text-white" style="font-size: 32px;"></i>
+</div>
+<div class="info">
+<a class="d-block" href="profile.html" id="sidebar-merchant-name">商家名称</a>
+</div>
+</div>
+<nav class="mt-2">
+<ul class="nav nav-pills nav-sidebar flex-column" data-accordion="false" data-widget="treeview" role="menu">
+<li class="nav-item">
+<a class="nav-link" href="dashboard.html">
+<i class="nav-icon fa fa-dashboard"></i>
+<p>仪表盘</p>
+</a>
+</li>
+<li class="nav-item">
+<a class="nav-link active" href="products.html">
+<i class="nav-icon fa fa-shopping-bag"></i>
+<p>商品管理</p>
+</a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="reviews.html">
+<i class="nav-icon fa fa-comment"></i>
+<p>评价管理</p>
+</a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="profile.html">
+<i class="nav-icon fa fa-user"></i>
+<p>商家设置</p>
+</a>
+</li>
+</ul>
+</nav>
+</div>
+</aside>
+<div class="content-wrapper">
+<div class="content-header">
+<div class="container-fluid">
+<div class="row mb-2">
+<div class="col-sm-6">
+<h1 class="m-0">商品管理</h1>
+</div>
+</div>
+</div>
+</div>
+<div class="content">
+<div class="container-fluid">
+<div class="card">
+<div class="card-header">
+<h3 class="card-title">筛选商品</h3>
+</div>
+<div class="card-body">
+<div class="row align-items-end">
+<div class="col-md-8">
+<div class="input-group">
+<input class="form-control" id="productSearchInput" placeholder="搜索商品名称或描述" type="text"/>
+<div class="input-group-append">
+<button class="btn btn-primary" id="productSearchButton" type="button">
+<i class="fa fa-search"></i> 搜索
+                                            </button>
+</div>
+</div>
+</div>
+<div class="col-md-4">
+<select class="form-control" id="categoryFilter">
+<option value="">全部分类</option>
+</select>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="card mt-3">
+<div class="card-header">
+<div class="card-title">商品列表</div>
+<div class="card-tools">
+<button class="btn btn-primary btn-sm" id="addProductButton" type="button">
+<i class="fa fa-plus"></i> 添加商品
+                                </button>
+</div>
+</div>
+<div class="card-body">
+<div class="table-responsive">
+<table class="table table-hover text-nowrap" id="productsTable">
+<thead>
+<tr>
+<th>ID</th>
+<th>商品图片</th>
+<th>商品名称</th>
+<th>分类</th>
+<th>评分</th>
+<th>评价数</th>
+<th>创建时间</th>
+<th>操作</th>
+</tr>
+</thead>
+<tbody>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div aria-hidden="true" aria-labelledby="productModalLabel" class="modal fade" id="productModal" role="dialog" tabindex="-1">
+<div class="modal-dialog modal-lg" role="document">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title" id="productModalLabel">添加商品</h5>
+<button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button">
+</button>
+</div>
+<form enctype="multipart/form-data" id="productForm">
+<div class="modal-body">
+<input id="productId" type="hidden"/>
+<div class="row">
+<div class="col-md-6">
+<div class="form-group">
+<label for="productName">商品名称 <span class="text-danger">*</span></label>
+<input class="form-control" id="productName" name="name" placeholder="请输入商品名称" required="" type="text"/>
+</div>
+<div class="form-group">
+<label for="productCategory">分类 <span class="text-danger">*</span></label>
+<select class="form-control" id="productCategory" name="category" required="">
+<option value="">请选择分类</option>
+</select>
+</div>
+</div>
+<div class="col-md-6">
+<div class="form-group">
+<label for="productDescription">商品描述</label>
+<textarea class="form-control" id="productDescription" name="description" placeholder="请输入商品描述" rows="4"></textarea>
+</div>
+<div class="form-group">
+<label for="productImage">商品图片</label>
+<div class="input-group">
+<div class="custom-file">
+<input accept="image/*" class="custom-file-input" id="productImage" name="image" type="file"/>
+<label class="custom-file-label" for="productImage">选择图片</label>
+</div>
+</div>
+<small class="form-text text-muted">支持JPG、PNG格式，建议尺寸800x800像素</small>
+</div>
+<div class="mt-3 d-none" id="imagePreviewContainer">
+<label>预览：</label>
+<div class="mt-2">
+<img alt="商品图片预览" class="img-fluid img-thumbnail" id="imagePreview" src="" style="max-height: 200px;"/>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="modal-footer">
+<button class="btn btn-secondary" data-bs-dismiss="modal" type="button">取消</button>
+<button class="btn btn-primary" type="submit">保存</button>
+</div>
+</form>
+</div>
+</div>
+</div>
+<div aria-hidden="true" aria-labelledby="deleteConfirmModalLabel" class="modal fade" id="deleteConfirmModal" role="dialog" tabindex="-1">
+<div class="modal-dialog" role="document">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title" id="deleteConfirmModalLabel">确认删除</h5>
+<button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button">
+</button>
+</div>
+<div class="modal-body">
+<input id="productIdToDelete" type="hidden"/>
+<p>您确定要删除商品 <span class="font-weight-bold" id="productNameToDelete"></span> 吗？</p>
+<p class="text-danger">注意：删除后将无法恢复，且相关订单和评价也将受到影响。</p>
+</div>
+<div class="modal-footer">
+<button class="btn btn-secondary" data-bs-dismiss="modal" type="button">取消</button>
+<button class="btn btn-danger" id="confirmDeleteButton" type="button">确认删除</button>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+<script src="../libs/jquery/3.7.1/dist/jquery.min.js"></script>
+<script src="../libs/bootstrap/5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../libs/datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="../libs/datatables.net-bs5/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<script src="../libs/admin-lte/3.2.0/dist/js/adminlte.min.js"></script>
+<script>
+        const token = localStorage.getItem('jwtToken');
+        if (!token) {
+            window.location.href = 'login.html';
+        }
+
+        const HEADERS = {
+            'Authorization': `Bearer ${token}`
+        };
+        
+        const merchant = JSON.parse(localStorage.getItem('user'));
+        if (!merchant) {
+            window.location.href = 'login.html';
+        }
+
+        if (merchant && merchant.name) {
+            document.getElementById('merchantName').textContent = merchant.name;
+            document.getElementById('sidebar-merchant-name').textContent = merchant.name;
+        }
+
+        document.getElementById('logoutButton').addEventListener('click', () => {
+            localStorage.removeItem('jwtToken');
+            localStorage.removeItem('user');
+            window.location.href = 'login.html';
+        });
+
+        let searchTerm = '';
+        let selectedCategory = '';
+        let allProducts = [];
+
+        let productsTable;
+        function initProductsTable() {
+            productsTable = $('#productsTable').DataTable({
+                "processing": false,
+                "serverSide": false,
+                "searching": false,
+                "data": [],
+                "columns": [
+                    { "data": "id" },
+                    { 
+                        "data": "imageUrls",
+                        "render": function(data, type, row) {
+                            if (data) {
+                                return `<img src="${data}" class="product-image" alt="${row.name}">`;
+                            } else {
+                                return `<i class="fa fa-shopping-bag" style="font-size: 40px; color: #ccc;"></i>`;
+                            }
+                        }
+                    },
+                    { "data": "name" },
+                    { 
+                        "data": "categoryName",
+                        "render": function(data, type, row) {
+                            return data || '未知';
+                        }
+                    },
+                    { 
+                        "data": "averageRating",
+                        "render": function(data, type, row) {
+                            return data ? data.toFixed(1) + '★' : '0.0★';
+                        }
+                    },
+                    { 
+                        "data": "reviewCount",
+                        "render": function(data, type, row) {
+                            return data || 0;
+                        }
+                    },
+                    { 
+                        "data": "createdAt",
+                        "render": function(data, type, row) {
+                            return formatDate(data);
+                        }
+                    },
+                    { 
+                        "data": null,
+                        "render": function(data, type, row) {
+                            return `
+                                <button class="btn btn-sm btn-primary edit-btn" data-id="${row.id}"><i class="fa fa-edit"></i> 编辑</button>
+                                <button class="btn btn-sm btn-danger delete-btn" data-id="${row.id}" data-name="${row.name}"><i class="fa fa-trash"></i> 删除</button>
+                            `;
+                        }
+                    }
+                ],
+                "language": {
+                    "search": "搜索:",
+                    "lengthMenu": "每页显示 _MENU_ 条记录",
+                    "info": "显示第 _START_ 至 _END_ 条记录，共 _TOTAL_ 条",
+                    "infoEmpty": "没有找到记录",
+                    "infoFiltered": "(从 _MAX_ 条记录中过滤)",
+                    "zeroRecords": "没有找到匹配的记录",
+                    "paginate": {
+                        "first": "首页",
+                        "last": "末页",
+                        "next": "下一页",
+                        "previous": "上一页"
+                    }
+                }
+            });
+
+            $('#productsTable').on('click', '.edit-btn', function() {
+                const productId = $(this).data('id');
+                loadProductDetails(productId);
+            });
+
+            $('#productsTable').on('click', '.delete-btn', function() {
+                const productId = $(this).data('id');
+                const productName = $(this).data('name');
+                showDeleteConfirm(productId, productName);
+            });
+        }
+
+        async function loadProductData() {
+            try {
+                const response = await fetch('http://localhost:8080/api/products/my-products', {
+                    headers: HEADERS
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    allProducts = data.content || [];
+                    filterAndRenderProducts();
+                } else {
+                    console.error('获取商品数据失败:', response.status);
+                    showNotification('error', '获取商品数据失败');
+                }
+            } catch (error) {
+                console.error('获取商品数据失败:', error);
+                showNotification('error', '网络错误，请稍后重试');
+            }
+        }
+
+        function filterAndRenderProducts() {
+            let filteredProducts = [...allProducts];
+
+            if (searchTerm) {
+                const term = searchTerm.toLowerCase();
+                filteredProducts = filteredProducts.filter(product => 
+                    product.name && product.name.toLowerCase().includes(term)
+                );
+            }
+
+            if (selectedCategory) {
+                filteredProducts = filteredProducts.filter(product => 
+                    product.categoryId == selectedCategory || 
+                    (product.category && product.category.id == selectedCategory)
+                );
+            }
+
+            productsTable.clear().rows.add(filteredProducts).draw();
+        }
+
+        async function loadCategories() {
+            try {
+                const response = await fetch('http://localhost:8080/api/categories', {
+                    method: 'GET',
+                    headers: HEADERS
+                });
+                
+                if (response.ok) {
+                    const categories = await response.json();
+                    console.log('获取到的分类数据:', categories);
+                    return categories;
+                } else {
+                    console.error('获取分类列表失败:', response.status);
+                    return [];
+                }
+            } catch (error) {
+                console.error('获取分类列表失败:', error);
+                return [];
+            }
+        }
+
+        async function getCurrentMerchantId() {
+            try {
+                const response = await fetch('http://localhost:8080/api/merchants/my-merchant', {
+                    method: 'GET',
+                    headers: HEADERS
+                });
+                
+                if (response.ok) {
+                    const merchant = await response.json();
+                    console.log('获取到的商家信息:', merchant);
+                    return merchant.id;
+                } else if (response.status === 401) {
+                    showNotification('error', '登录已过期，请重新登录');
+                    localStorage.removeItem('jwtToken');
+                    localStorage.removeItem('user');
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 2000);
+                    throw new Error('登录已过期');
+                } else if (response.status === 403) {
+                    showNotification('error', '当前账号没有商家权限，请联系管理员');
+                    throw new Error('没有商家权限');
+                } else if (response.status === 404) {
+                    showNotification('error', '未找到商家信息，请先创建商家');
+                    throw new Error('商家信息不存在');
+                } else {
+                    console.error('获取商家信息失败:', response.status);
+                    showNotification('error', '获取商家信息失败，请稍后重试');
+                    throw new Error('无法获取商家信息');
+                }
+            } catch (error) {
+                console.error('获取商家信息失败:', error);
+                throw error;
+            }
+        }
+
+        function populateCategoryDropdown(categories) {
+            const categorySelect = document.getElementById('productCategory');
+            while (categorySelect.options.length > 1) {
+                categorySelect.remove(1);
+            }
+
+            categories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category.id;
+                option.textContent = category.name;
+                categorySelect.appendChild(option);
+            });
+        }
+
+        async function loadProductDetails(productId) {
+            try {
+                console.log('开始请求商品详情，ID:', productId);
+                const response = await fetch(`http://localhost:8080/api/products/${productId}`, {
+                    headers: HEADERS
+                });
+                
+                console.log('商品详情响应状态:', response.status);
+                console.log('商品详情响应URL:', response.url);
+                
+                if (response.ok) {
+                    const product = await response.json();
+                    console.log('获取到的商品详情:', product);
+                    console.log('图片URL:', product.imageUrls);
+
+                    const categories = await loadCategories();
+                    populateCategoryDropdown(categories);
+
+                    document.getElementById('productModalLabel').textContent = '编辑商品';
+                    document.getElementById('productId').value = product.id;
+                    document.getElementById('productName').value = product.name;
+                    document.getElementById('productCategory').value = product.categoryId;
+                    document.getElementById('productDescription').value = product.description || '';
+
+                    const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+                    const imagePreview = document.getElementById('imagePreview');
+
+                    imagePreviewContainer.classList.add('d-none');
+                    document.getElementById('productImage').value = '';
+                    const existingImageInput = document.getElementById('existingImageUrl');
+                    if (existingImageInput) {
+                        existingImageInput.remove();
+                    }
+                     
+                    if (product.imageUrls) {
+                        console.log('设置图片预览URL:', product.imageUrls);
+                        imagePreviewContainer.classList.remove('d-none');
+                        imagePreview.src = product.imageUrls;
+                        console.log('图片元素src属性:', imagePreview.src);
+                        console.log('图片元素complete状态:', imagePreview.complete);
+                        console.log('图片元素naturalWidth:', imagePreview.naturalWidth);
+                        console.log('图片元素naturalHeight:', imagePreview.naturalHeight);
+
+                        const hiddenInput = document.createElement('input');
+                        hiddenInput.type = 'hidden';
+                        hiddenInput.id = 'existingImageUrl';
+                        hiddenInput.name = 'existingImageUrl';
+                        hiddenInput.value = product.imageUrls;
+                        document.getElementById('productForm').appendChild(hiddenInput);
+                    } else {
+                        console.log('没有图片URL，隐藏预览');
+                    }
+
+                    $('#productModal').modal('show');
+                } else {
+                    showNotification('error', '加载商品详情失败');
+                }
+            } catch (error) {
+                console.error('加载商品详情失败:', error);
+                showNotification('error', '网络错误，请稍后重试');
+            }
+        }
+
+        function showDeleteConfirm(productId, productName) {
+            document.getElementById('productIdToDelete').value = productId;
+            document.getElementById('productNameToDelete').textContent = productName;
+            $('#deleteConfirmModal').modal('show');
+        }
+
+        document.getElementById('confirmDeleteButton').addEventListener('click', async function() {
+            const productId = document.getElementById('productIdToDelete').value;
+            
+            try {
+                const response = await fetch(`http://localhost:8080/api/products/${productId}`, {
+                    method: 'DELETE',
+                    headers: HEADERS
+                });
+                
+                if (response.ok) {
+                    $('#deleteConfirmModal').modal('hide');
+                    await loadProductData();
+                    showNotification('success', '商品删除成功');
+                } else {
+                    const errorData = await response.json();
+                    showNotification('error', errorData.message || '商品删除失败');
+                }
+            } catch (error) {
+                console.error('删除商品失败:', error);
+                showNotification('error', '网络错误，请稍后重试');
+            }
+        });
+        
+
+
+        document.getElementById('productForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const productId = document.getElementById('productId').value;
+            const name = document.getElementById('productName').value;
+            const category = document.getElementById('productCategory').value;
+            const description = document.getElementById('productDescription').value;
+            const imageFile = document.getElementById('productImage').files[0];
+
+            if (!name || !category) {
+                showNotification('error', '请填写商品名称和分类');
+                return;
+            }
+
+            let merchantId = null;
+            try {
+                merchantId = await getCurrentMerchantId();
+            } catch (error) {
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('name', name);
+            formData.append('categoryId', category);
+            formData.append('merchantId', merchantId);
+            if (description) {
+                formData.append('description', description);
+            }
+            if (imageFile) {
+                formData.append('imageFile', imageFile);
+            } else if (productId) {
+                const existingImageUrl = document.getElementById('existingImageUrl')?.value;
+                if (existingImageUrl) {
+                    formData.append('existingImageUrl', existingImageUrl);
+                }
+            }
+
+            const method = productId ? 'PUT' : 'POST';
+            const url = productId ? 
+                `http://localhost:8080/api/products/${productId}` : 
+                `http://localhost:8080/api/products`;
+            
+            try {
+                const authHeaders = { 'Authorization': HEADERS.Authorization };
+                const response = await fetch(url, {
+                    method: method,
+                    headers: authHeaders,
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    $('#productModal').modal('hide');
+                    await loadProductData();
+                    showNotification('success', productId ? '商品更新成功' : '商品创建成功');
+                } else {
+                    const errorData = await response.json();
+                    showNotification('error', errorData.message || (productId ? '商品更新失败' : '商品创建失败'));
+                }
+            } catch (error) {
+                console.error(productId ? '更新商品失败:' : '创建商品失败:', error);
+                showNotification('error', '网络错误，请稍后重试');
+            }
+        });
+
+        document.getElementById('addProductButton').addEventListener('click', async function() {
+            document.getElementById('productForm').reset();
+            document.getElementById('productModalLabel').textContent = '添加商品';
+            document.getElementById('productId').value = '';
+            document.getElementById('imagePreviewContainer').classList.add('d-none');
+
+            const categories = await loadCategories();
+            populateCategoryDropdown(categories);
+
+            $('#productModal').modal('show');
+        });
+
+        document.getElementById('productSearchButton').addEventListener('click', function() {
+            searchTerm = document.getElementById('productSearchInput').value.trim();
+            console.log('搜索关键词:', searchTerm);
+            filterAndRenderProducts();
+        });
+
+        document.getElementById('productSearchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchTerm = e.target.value.trim();
+                console.log('搜索关键词:', searchTerm);
+                filterAndRenderProducts();
+            }
+        });
+
+        document.getElementById('categoryFilter').addEventListener('change', function(e) {
+            selectedCategory = e.target.value;
+            console.log('选择的分类:', selectedCategory);
+            filterAndRenderProducts();
+        });
+        
+
+
+        document.getElementById('productImage').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+                    const imagePreview = document.getElementById('imagePreview');
+                    
+                    imagePreview.src = event.target.result;
+                    imagePreviewContainer.classList.remove('d-none');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            const date = new Date(dateString);
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            return `${year}-${month}-${day} ${hours}:${minutes}`;
+        }
+
+        function showNotification(type, message) {
+            console.log('通知:', type, message);
+        }
+
+        window.addEventListener('load', async function() {
+            try {
+                const categories = await loadCategories();
+                populateCategoryFilter(categories);
+
+                await loadProductData();
+            } catch (error) {
+                console.error('初始化失败:', error);
+            }
+        });
+
+        function populateCategoryFilter(categories) {
+            const categoryFilter = document.getElementById('categoryFilter');
+            while (categoryFilter.options.length > 1) {
+                categoryFilter.remove(1);
+            }
+
+            categories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category.id;
+                option.textContent = category.name;
+                categoryFilter.appendChild(option);
+            });
+        }
+
+        initMerchantPage(initProductsTable);
+    </script>
+</div>
+
+</div>
+</body>
+</html>

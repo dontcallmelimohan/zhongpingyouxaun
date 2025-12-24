@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>商家管理 - 众评优选后台</title>
+<link href="../libs/bootstrap/5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="../libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet"/>
+<link href="../libs/datatables.net-bs5/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet"/>
+<link href="../libs/datatables.net-responsive/2.4.1/css/responsive.bootstrap5.min.css" rel="stylesheet"/>
+<link href="../libs/admin-lte/3.2.0/dist/css/adminlte.min.css" rel="stylesheet"/>
+<link href="css/admin.css" rel="stylesheet"/>
+</head>
+<body class="hold-transition sidebar-mini">
+<div class="wrapper">
+<div id="common-header">
+</div>
+<div class="content-wrapper">
+<section class="content-header">
+<div class="container-fluid">
+<div class="row mb-2">
+<div class="col-sm-6">
+<h1>商家管理</h1>
+</div>
+</div>
+</div>
+</section>
+<section class="content">
+<div class="container-fluid">
+<div class="card">
+<div class="card-header">
+<h3 class="card-title">商家列表</h3>
+<div class="card-tools">
+<div class="input-group input-group-sm" style="width: 300px;">
+<input class="form-control float-right" id="merchantSearchInput" placeholder="搜索商家名称或描述" type="text"/>
+<div class="input-group-append">
+<button class="btn btn-default" id="merchantSearchButton" type="button">
+<i class="fas fa-search"></i>
+</button>
+</div>
+</div>
+</div>
+</div>
+<div class="card-body">
+<button class="btn btn-primary btn-sm mb-3" id="createMerchantBtn"><i class="fas fa-plus"></i> 添加新商家</button>
+<table class="table table-bordered table-striped" id="merchantsTable">
+<thead>
+<tr>
+<th>ID</th>
+<th>名称</th>
+<th>描述</th>
+<th>地址</th>
+<th>商家账号</th>
+<th>操作</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+</div>
+</div>
+
+
+</div>
+<div class="modal fade" id="merchantModal" role="dialog" tabindex="-1">
+<div class="modal-dialog" role="document">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title" id="merchantModalTitle">添加新商家</h5>
+<button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+</div>
+<form id="merchantForm">
+<div class="modal-body">
+<input id="merchantId" type="hidden"/>
+<div class="form-group">
+<label for="merchantName">商家名称 *</label>
+<input class="form-control" id="merchantName" placeholder="输入商家名称" required="" type="text"/>
+</div>
+<div class="form-group">
+<label for="merchantDescription">商家描述</label>
+<textarea class="form-control" id="merchantDescription" placeholder="输入商家描述" rows="3"></textarea>
+</div>
+<div class="form-group">
+<label for="merchantAddress">商家地址</label>
+<input class="form-control" id="merchantAddress" placeholder="输入商家地址" type="text"/>
+            </div>
+            <div class="row region-selector-container" style="margin-bottom: 15px;">
+                <div class="col-md-4">
+                    <div class="form-group" style="margin-bottom: 5px;">
+                        <label for="merchantProvince" style="font-size: 12px; min-width: 50px; margin-right: 5px;">省份</label>
+                        <select class="form-control" id="merchantProvince" style="min-width: auto; width: 100%; font-size: 12px; padding: 5px 10px;"></select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group" style="margin-bottom: 5px;">
+                        <label for="merchantCity" style="font-size: 12px; min-width: 50px; margin-right: 5px;">城市</label>
+                        <select class="form-control" id="merchantCity" style="min-width: auto; width: 100%; font-size: 12px; padding: 5px 10px;"></select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group" style="margin-bottom: 5px;">
+                        <label for="merchantArea" style="font-size: 12px; min-width: 50px; margin-right: 5px;">区县</label>
+                        <select class="form-control" id="merchantArea" style="min-width: auto; width: 100%; font-size: 12px; padding: 5px 10px;"></select>
+                    </div>
+                </div>
+            </div>
+            
+            <style>
+                .region-selector-container .form-group {
+                    display: flex;
+                    align-items: center;
+                    flex-wrap: nowrap;
+                    margin-bottom: 5px !important;
+                    width: 100%;
+                }
+                
+                .region-selector-container .form-control {
+                    border-radius: 4px;
+                    border: 1px solid #ddd;
+                    font-size: 12px;
+                    padding: 5px 10px;
+                    min-width: auto !important;
+                    width: 100%;
+                }
+                
+                .region-selector-container label {
+                    font-size: 12px;
+                    min-width: 50px;
+                    margin-right: 5px;
+                    font-weight: 500;
+                    color: #495057;
+                }
+            </style>
+<div class="form-group">
+<label for="merchantOwner">商家账号</label>
+<select class="form-control" id="merchantOwner" required="">
+<option value="">请选择商家账号</option>
+</select>
+</div>
+</div>
+<div class="modal-footer">
+<button class="btn btn-secondary" data-bs-dismiss="modal" type="button">关闭</button>
+<button class="btn btn-primary" type="submit">保存</button>
+</div>
+</form>
+</div>
+</div>
+</div>
+<script src="../libs/jquery/3.7.1/dist/jquery.min.js"></script>
+<script src="../libs/bootstrap/5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../libs/datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="../libs/datatables.net-bs5/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<script src="../libs/datatables.net-responsive/2.4.1/js/dataTables.responsive.min.js"></script>
+<script src="../libs/datatables.net-responsive-bs5/2.4.1/js/responsive.bootstrap5.min.js"></script>
+<script src="../libs/admin-lte/3.2.0/dist/js/adminlte.min.js"></script>
+<script src="/js/region-selector.js"></script>
+<script>
+        const token = localStorage.getItem('jwtToken');
+        if (!token) {
+            console.error('未找到认证token');
+            setTimeout(() => {
+                window.location.href = 'login.html';
+            }, 1000);
+        } else {
+            let user = null;
+            try {
+                user = JSON.parse(localStorage.getItem('user'));
+            } catch (e) {
+                console.error('解析用户信息失败:', e);
+            }
+            
+            if (user) {
+                if (!user.roles || !user.roles.includes('ROLE_ADMIN')) {
+                    alert('您无权访问管理后台！只有管理员可以进入。');
+                    setTimeout(() => {
+                        window.location.href = '/index.html';
+                    }, 500);
+                }
+            } else {
+                console.warn('未找到完整用户信息，将尝试继续加载页面');
+            }
+        }
+        
+        
+
+        let searchTerm = '';
+        let allMerchants = [];
+        
+        const API_URL = 'http://localhost:8080/api/merchants';
+        const HEADERS = { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
+
+        function initSearchFunctionality() {
+            document.getElementById('merchantSearchInput').addEventListener('input', function() {
+                searchTerm = this.value.trim().toLowerCase();
+                filterAndRenderMerchants();
+            });
+
+            document.getElementById('merchantSearchButton').addEventListener('click', function() {
+                searchTerm = document.getElementById('merchantSearchInput').value.trim().toLowerCase();
+                filterAndRenderMerchants();
+            });
+        }
+
+        async function loadMerchantData() {
+            try {
+                let queryParams = '?page=0&size=100';
+
+                const response = await fetch(`${API_URL}${queryParams}`, { 
+                    method: 'GET',
+                    headers: HEADERS
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                allMerchants = data.content || data;
+
+                if (!window.filterInitialized) {
+                    initSearchFunctionality();
+                    window.filterInitialized = true;
+                }
+
+                filterAndRenderMerchants();
+                
+            } catch (error) {
+                console.error('加载商家数据失败:', error);
+                showNotification('error', '数据加载失败，请稍后重试');
+
+                const tableBody = document.querySelector('#merchantsTable tbody');
+                tableBody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">数据加载失败，请稍后重试</td></tr>';
+            }
+        }
+
+        function filterAndRenderMerchants() {
+            const tableBody = document.querySelector('#merchantsTable tbody');
+            tableBody.innerHTML = '';
+
+            let filteredMerchants = allMerchants.filter(merchant => {
+                const searchMatch = !searchTerm || 
+                                   (merchant.name && merchant.name.toLowerCase().includes(searchTerm)) ||
+                                   (merchant.description && merchant.description.toLowerCase().includes(searchTerm));
+                
+                return searchMatch;
+            });
+
+            if (!filteredMerchants || filteredMerchants.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="6" class="text-center">暂无匹配数据</td></tr>';
+                return;
+            }
+            
+            filteredMerchants.forEach(merchant => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${merchant.id}</td>
+                    <td>${merchant.name}</td>
+                    <td>${merchant.description || '-'}</td>
+                    <td>${merchant.address || '-'}</td>
+                    <td>${merchant.ownerUsername || '-'}</td>
+                    <td>
+                        <button class="btn btn-info btn-sm edit-btn" data-id="${merchant.id}"><i class="fas fa-edit"></i></button>
+                        <button class="btn btn-danger btn-sm delete-btn" data-id="${merchant.id}" data-name="${merchant.name}"><i class="fas fa-trash"></i></button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+
+            bindTableEvents();
+        }
+
+        function bindTableEvents() {
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', async function() {
+                    const id = this.getAttribute('data-id');
+                    try {
+                        const response = await fetch(`${API_URL}/${id}`, { headers: HEADERS });
+                        if (response.ok) {
+                            const merchant = await response.json();
+                            console.log('获取到的商家完整数据:', merchant);
+                            const allRegionFields = Object.keys(merchant).filter(key => 
+                                key.toLowerCase().includes('province') || 
+                                key.toLowerCase().includes('city') || 
+                                key.toLowerCase().includes('area')
+                            );
+                            console.log('找到的地区相关字段:', allRegionFields);
+                            document.getElementById('merchantModalTitle').textContent = '编辑商家';
+                        document.getElementById('merchantId').value = merchant.id;
+                        document.getElementById('merchantName').value = merchant.name || '';
+                        document.getElementById('merchantDescription').value = merchant.description || '';
+                        document.getElementById('merchantAddress').value = merchant.address || '';
+
+                        if (defaultRegionSelector) {
+                            const province = merchant.province || merchant.Province || '';
+                            const city = merchant.city || merchant.City || '';
+                            const area = merchant.area || merchant.Area || '';
+                            
+                            console.log('设置地区选择器值:', {
+                                province: province,
+                                city: city,
+                                area: area
+                            });
+                            
+                            try {
+
+                                if (!defaultRegionSelector.regionsData) {
+                                    await defaultRegionSelector.loadRegionsData();
+                                }
+
+                                defaultRegionSelector.clearSelector('#merchantProvince', '#merchantCity', '#merchantArea');
+
+                                await defaultRegionSelector.init('#merchantProvince', '#merchantCity', '#merchantArea', {
+                                    defaultProvince: province,
+                                    defaultCity: city,
+                                    defaultArea: area
+                                });
+
+                                setTimeout(() => {
+                                    try {
+                                        defaultRegionSelector.setSelectedRegions(
+                                            '#merchantProvince',
+                                            '#merchantCity',
+                                            '#merchantArea',
+                                            {
+                                                province: province,
+                                                city: city,
+                                                area: area
+                                            }
+                                        );
+                                    } catch (finalError) {
+                                        console.error('最终保障方案也失败:', finalError);
+                                    }
+                                }, 50);
+                            } catch (error) {
+                                console.error('地区选择器设置失败:', error);
+                                
+
+                                setTimeout(() => {
+                                    try {
+                                        defaultRegionSelector.setSelectedRegions(
+                                            '#merchantProvince',
+                                            '#merchantCity',
+                                            '#merchantArea',
+                                            {
+                                                province: province,
+                                                city: city,
+                                                area: area
+                                            }
+                                        );
+                                    } catch (retryError) {
+                                        console.error('备用方案1失败:', retryError);
+                                        
+
+                                        setTimeout(() => {
+                                            try {
+                                                const provinceSelect = document.querySelector('#merchantProvince');
+                                                const citySelect = document.querySelector('#merchantCity');
+                                                const areaSelect = document.querySelector('#merchantArea');
+
+                                                if (provinceSelect && province) {
+                                                    provinceSelect.value = province;
+                                                    provinceSelect.dispatchEvent(new Event('change'));
+                                                }
+                                                if (citySelect && city) {
+                                                    setTimeout(() => {
+                                                        citySelect.value = city;
+                                                        citySelect.dispatchEvent(new Event('change'));
+                                                    }, 50);
+                                                }
+                                                if (areaSelect && area) {
+                                                    setTimeout(() => {
+                                                        areaSelect.value = area;
+                                                    }, 100);
+                                                }
+                                            } catch (domError) {
+                                                console.error('备用方案2（DOM操作）也失败:', domError);
+                                            }
+                                        }, 100);
+                                    }
+                                }, 150);
+                            }
+                        }
+
+
+                        await loadMerchantAccounts();
+
+                        document.getElementById('merchantOwner').value = merchant.ownerUsername || '';
+                              
+
+                            const merchantModal = new bootstrap.Modal(document.getElementById('merchantModal'));
+                            merchantModal.show();
+                        }
+                    } catch (error) {
+                        console.error('获取商家详情失败:', error);
+                        showNotification('error', '获取商家详情失败');
+                    }
+                });
+            });
+            
+
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', async function() {
+                    const id = this.getAttribute('data-id');
+                    const name = this.getAttribute('data-name');
+                    
+                    if (confirm(`确定删除商家 "${name}"?`)) {
+                        try {
+                            const response = await fetch(`/api/admin/merchants/${id}`, {
+                                method: 'DELETE',
+                                headers: HEADERS
+                            });
+                            if (response.ok) {
+                                loadMerchantData();
+                                showNotification('success', '商家删除成功！');
+                            } else {
+                                const errorData = await response.json();
+                                showNotification('error', errorData.message || '删除失败');
+                            }
+                        } catch (error) {
+                            console.error('删除失败:', error);
+                            showNotification('error', '网络错误，请稍后重试');
+                        }
+                    }
+                });
+            });
+        }
+        
+
+        function showNotification(type, message) {
+
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type} position-fixed top-5 end-5 p-3 z-50`;
+            toast.setAttribute('role', 'alert');
+            toast.setAttribute('aria-live', 'assertive');
+            toast.setAttribute('aria-atomic', 'true');
+            toast.innerHTML = `
+                <div class="toast-header">
+                    <strong class="me-auto">通知</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                    ${message}
+                </div>
+            `;
+            document.body.appendChild(toast);
+            
+            const toastBootstrap = bootstrap.Toast.getOrCreateInstance(toast);
+            toastBootstrap.show();
+            
+
+            setTimeout(() => {
+                toastBootstrap.hide();
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 500);
+            }, 3000);
+        }
+
+
+        document.getElementById('createMerchantBtn').addEventListener('click', async function() {
+            document.getElementById('merchantModalTitle').textContent = '添加新商家';
+            document.getElementById('merchantForm').reset();
+            document.getElementById('merchantId').value = '';
+            
+
+            if (defaultRegionSelector) {
+                await defaultRegionSelector.init('#merchantProvince', '#merchantCity', '#merchantArea');
+            }
+            
+
+            await loadMerchantAccounts();
+            
+
+            const merchantModal = new bootstrap.Modal(document.getElementById('merchantModal'));
+            merchantModal.show();
+        });
+        
+
+        async function loadMerchantAccounts() {
+            try {
+                console.log('开始加载商家账号数据...');
+
+                const response = await fetch('/api/admin/users', {
+                    method: 'GET',
+                    headers: HEADERS
+                });
+                
+                console.log('API响应状态:', response.status);
+                
+                if (response.ok) {
+                    const userData = await response.json();
+                    console.log('获取到的用户数据:', userData);
+                    
+                    const ownerSelect = document.getElementById('merchantOwner');
+                    
+
+                    while (ownerSelect.options.length > 1) {
+                        ownerSelect.remove(1);
+                    }
+                    
+
+                    const users = userData.content || userData;
+                    
+
+                    if (users && users.length > 0) {
+                        const merchantUsers = users.filter(user => 
+                            user.roles && user.roles.some(role => role.name === 'ROLE_MERCHANT')
+                        );
+                        
+                        console.log('筛选后的商家账号数量:', merchantUsers.length);
+                        console.log('商家用户数据:', merchantUsers);
+                        
+
+                        merchantUsers.forEach(account => {
+
+                            if (account && account.username) {
+                                const option = document.createElement('option');
+                                option.value = account.username;
+                                option.textContent = account.username;
+                                ownerSelect.appendChild(option);
+                            }
+                        });
+                        console.log('成功添加商家账号选项到下拉框');
+                    } else {
+                        console.log('未获取到任何用户数据');
+                    }
+                } else {
+                    const errorText = await response.text();
+                    console.error('加载商家账号失败，API返回错误:', response.status, errorText);
+                    showNotification('error', `加载商家账号失败: ${response.status}`);
+                }
+            } catch (error) {
+                console.error('加载商家账号失败，网络错误:', error);
+                showNotification('error', '加载商家账号失败，请检查网络连接');
+            }
+        }
+        
+
+        document.getElementById('merchantForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const id = document.getElementById('merchantId').value;
+            const method = id ? 'PUT' : 'POST';
+            const url = id ? `/api/admin/merchants/${id}` : '/api/admin/merchants';
+            
+
+            let regions = {province: '', city: '', area: ''};
+            if (defaultRegionSelector) {
+                regions = defaultRegionSelector.getSelectedRegions('#merchantProvince', '#merchantCity', '#merchantArea');
+            }
+            
+            const ownerUsername = document.getElementById('merchantOwner').value;
+            
+
+            try {
+
+                const checkResponse = await fetch(`/api/admin/check-merchant-exists?username=${encodeURIComponent(ownerUsername)}`, {
+                    method: 'GET',
+                    headers: HEADERS
+                });
+                
+                if (checkResponse.ok) {
+                    const result = await checkResponse.json();
+                    if (result.exists) {
+
+                        if (id) {
+
+                            const currentMerchant = allMerchants.find(m => m.id == id);
+                            if (currentMerchant && currentMerchant.ownerUsername === ownerUsername) {
+
+                            } else {
+
+                                alert('该账号已绑定商家，请选择其他账号或先删除现有商家');
+                                showNotification('error', '该账号已绑定商家，请选择其他账号或先删除现有商家');
+                                return;
+                            }
+                        } else {
+
+                            alert('该账号已绑定商家，请选择其他账号或先删除现有商家');
+                            showNotification('error', '该账号已绑定商家，请选择其他账号或先删除现有商家');
+                            return;
+                        }
+                    }
+                } else {
+
+                    console.warn('检查商家是否存在的接口调用失败，继续提交表单');
+                }
+            } catch (error) {
+                console.error('检查商家是否存在失败:', error);
+
+            }
+            
+            const body = JSON.stringify({
+                name: document.getElementById('merchantName').value,
+                description: document.getElementById('merchantDescription').value,
+                address: document.getElementById('merchantAddress').value,
+                ownerUsername: document.getElementById('merchantOwner').value,
+                province: regions.province,
+                city: regions.city,
+                area: regions.area
+            });
+            
+            try {
+                const response = await fetch(url, {
+                    method,
+                    headers: HEADERS,
+                    body
+                });
+                
+                if (response.ok) {
+
+                    const merchantModal = bootstrap.Modal.getInstance(document.getElementById('merchantModal'));
+                    merchantModal.hide();
+                    
+                    loadMerchantData();
+                    showNotification('success', id ? '商家更新成功！' : '商家创建成功！');
+                } else {
+                    let errorMessage = id ? '商家信息更新失败' : '商家添加失败';
+                    
+                    try {
+                        const errorData = await response.json();
+                        if (errorData.message) {
+                            errorMessage = errorData.message;
+                        }
+                    } catch (parseError) {
+
+                        console.error('解析错误响应失败:', parseError);
+                    }
+                    
+
+                    alert(errorMessage);
+                    showNotification('error', errorMessage);
+                }
+            } catch (error) {
+                console.error('操作失败:', error);
+                const errorMessage = '网络错误，请稍后重试';
+                alert(errorMessage);
+                showNotification('error', errorMessage);
+            }
+        });
+
+
+        async function initRegionSelector() {
+            if (defaultRegionSelector) {
+                try {
+                    await defaultRegionSelector.init('#merchantProvince', '#merchantCity', '#merchantArea');
+                } catch (error) {
+                    console.error('初始化地区选择器失败:', error);
+                }
+            }
+        }
+        
+
+        async function initPage() {
+            await initRegionSelector();
+            loadMerchantData();
+        }
+        
+
+        initPage();
+    </script>
+<script>
+        $(document).ready(function() {
+            $('#common-header').load('common-header.html', function() {
+
+                $('a[href="merchants.html"]').addClass('active');
+            });
+        });
+    </script>
+</body>
+</html>

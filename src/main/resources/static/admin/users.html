@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>众评优选 | 用户管理</title>
+<link href="../libs/bootstrap/5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="../libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet"/>
+<link href="../libs/datatables.net-bs5/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet"/>
+<link href="../libs/datatables.net-responsive-bs5/2.4.1/css/responsive.bootstrap5.min.css" rel="stylesheet"/>
+<link href="../libs/admin-lte/3.2.0/dist/css/adminlte.min.css" rel="stylesheet"/>
+<link href="css/admin.css" rel="stylesheet"/>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+<div id="common-header">
+</div>
+<div class="content-wrapper">
+<section class="content-header">
+<div class="container-fluid">
+<div class="row mb-2">
+<div class="col-sm-6">
+<h1>用户管理</h1>
+</div>
+</div>
+</div>
+</section>
+<section class="content">
+<div class="container-fluid">
+<div class="card">
+<div class="card-header">
+<h3 class="card-title">用户列表</h3>
+<div class="card-tools">
+<div class="input-group input-group-sm" style="width: 300px;">
+<input class="form-control float-right" id="searchInput" placeholder="搜索用户名或邮箱" type="text"/>
+<div class="input-group-append">
+<button class="btn btn-default" id="searchButton" type="button">
+<i class="fas fa-search"></i>
+</button>
+</div>
+</div>
+</div>
+</div>
+<div class="card-body">
+<div class="row mb-4">
+<div class="col-md-6">
+<div class="form-group">
+<label for="roleFilter">按角色筛选：</label>
+<select class="form-control" id="roleFilter">
+<option value="">全部角色</option>
+<option value="ROLE_USER">普通用户</option>
+<option value="ROLE_ADMIN">管理员</option>
+<option value="ROLE_MERCHANT">商家</option>
+</select>
+</div>
+</div>
+</div>
+<table class="table table-bordered table-striped" id="usersTable">
+<thead>
+<tr>
+<th>ID</th>
+<th>用户名</th>
+<th>邮箱</th>
+<th>注册时间</th>
+<th>角色</th>
+<th>操作</th>
+</tr>
+</thead>
+<tbody>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+</div>
+<div aria-hidden="true" aria-labelledby="editUserModalLabel" class="modal fade" id="editUserModal" tabindex="-1">
+<div class="modal-dialog">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title" id="editUserModalLabel">编辑用户</h5>
+<button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+</div>
+<div class="modal-body">
+<form id="editUserForm">
+<input id="editUserId" type="hidden"/>
+<div class="mb-3">
+<label class="form-label" for="editUsername">用户名</label>
+<input class="form-control" id="editUsername" required="" type="text"/>
+</div>
+<div class="mb-3">
+<label class="form-label" for="editEmail">邮箱</label>
+<input class="form-control" id="editEmail" required="" type="email"/>
+</div>
+<div class="mb-3">
+<label class="form-label" for="editRoles">角色</label>
+<select class="form-select" id="editRoles" multiple="">
+<option value="ROLE_USER">普通用户</option>
+<option value="ROLE_ADMIN">管理员</option>
+<option value="ROLE_MERCHANT">商家</option>
+</select>
+<div class="form-text">按住Ctrl键可多选</div>
+</div>
+</form>
+</div>
+<div class="modal-footer">
+<button class="btn btn-secondary" data-bs-dismiss="modal" type="button">取消</button>
+<button class="btn btn-primary" id="saveUserBtn" type="button">保存</button>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+<script src="../libs/jquery/3.7.1/dist/jquery.min.js"></script>
+<script src="../libs/bootstrap/5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../libs/datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="../libs/datatables.net-bs5/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<script src="../libs/datatables.net-responsive/2.4.1/js/dataTables.responsive.min.js"></script>
+<script src="../libs/datatables.net-responsive-bs5/2.4.1/js/responsive.bootstrap5.min.js"></script>
+<script src="../libs/admin-lte/3.2.0/dist/js/adminlte.min.js"></script>
+<script>
+  $(document).ready(function() {
+    $('#common-header').load('common-header.html', function() {
+      $('a[href="users.html"]').addClass('active');
+    });
+  });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const token = localStorage.getItem('jwtToken');
+        if (!token) {
+            return;
+        }
+
+        let searchTerm = '';
+        let selectedRole = '';
+        let allUsers = [];
+
+        const table = $('#usersTable').DataTable({
+            "responsive": true,
+            "autoWidth": false,
+            "processing": true,
+            "serverSide": false,
+            "paging": true,
+            "searching": false,
+            "columns": [
+                { "data": "id" },
+                { "data": "username" },
+                { "data": "email" },
+                { "data": "createdAt", "render": data => new Date(data).toLocaleString() },
+                { "data": "roles", "render": roles => roles.map(role => role.name.replace('ROLE_', '')).join(', ') },
+                {
+                    "data": null,
+                    "defaultContent": '<button class="btn btn-primary btn-sm edit-btn me-1">编辑</button><button class="btn btn-danger btn-sm delete-btn">删除</button>',
+                    "orderable": false
+                }
+            ]
+        });
+
+        $('#usersTable tbody').on('click', '.edit-btn', function () {
+            const data = table.row($(this).parents('tr')).data();
+            openEditModal(data);
+        });
+
+        $('#usersTable tbody').on('click', '.delete-btn', async function () {
+            const data = table.row($(this).parents('tr')).data();
+            const userId = data.id;
+
+            if (confirm(`确定要删除用户 "${data.username}" 吗？`)) {
+                try {
+                    const response = await fetch(`http://localhost:8080/api/admin/users/${userId}`, {
+                        method: 'DELETE',
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+
+                    if (response.ok) {
+                        alert('用户删除成功！');
+                        loadAllUsers();
+                    } else {
+                        const errorData = await response.json();
+                        alert(`删除失败: ${errorData.message}`);
+                    }
+                } catch (error) {
+                    console.error('Delete error:', error);
+                    alert('删除请求失败。');
+                }
+            }
+        });
+
+        $('#saveUserBtn').on('click', async function () {
+            await saveUser();
+        });
+
+        function openEditModal(user) {
+            $('#editUserId').val(user.id);
+            $('#editUsername').val(user.username);
+            $('#editEmail').val(user.email);
+
+            $('#editRoles').val(user.roles.map(role => role.name));
+            
+            const modal = new bootstrap.Modal(document.getElementById('editUserModal'));
+            modal.show();
+        }
+
+        document.getElementById('searchButton').addEventListener('click', () => {
+            searchTerm = document.getElementById('searchInput').value.trim();
+            filterAndRenderUsers();
+        });
+
+        document.getElementById('searchInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                searchTerm = e.target.value.trim();
+                filterAndRenderUsers();
+            }
+        });
+
+        document.getElementById('roleFilter').addEventListener('change', (e) => {
+            selectedRole = e.target.value;
+            filterAndRenderUsers();
+        });
+
+        function initFilterFunctionality() {
+            loadAllUsers();
+        }
+
+        function loadAllUsers() {
+            table.clear();
+            table.rows.add([]).draw();
+            
+            try {
+                $.ajax({
+                    url: "http://localhost:8080/api/admin/users?size=1000",
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    success: function(data) {
+                        if (data && data.content) {
+                            allUsers = data.content;
+                        } else if (Array.isArray(data)) {
+                            allUsers = data;
+                        } else {
+                            allUsers = [];
+                        }
+                        filterAndRenderUsers();
+                    },
+                    error: function(error) {
+                        console.error('Error loading users:', error);
+                        allUsers = [];
+                        filterAndRenderUsers();
+                    }
+                });
+            } catch (e) {
+                console.error('Error loading users:', e);
+                allUsers = [];
+                filterAndRenderUsers();
+            }
+        }
+
+        function filterAndRenderUsers() {
+            table.clear();
+
+            let filteredUsers = allUsers.filter(user => {
+                if (selectedRole && !user.roles.some(role => role.name === selectedRole)) {
+                    return false;
+                }
+
+                if (searchTerm) {
+                    const searchLower = searchTerm.toLowerCase();
+                    return (
+                        user.username.toLowerCase().includes(searchLower) ||
+                        user.email.toLowerCase().includes(searchLower)
+                    );
+                }
+                
+                return true;
+            });
+
+            table.rows.add(filteredUsers).draw();
+        }
+
+        initFilterFunctionality();
+
+        async function saveUser() {
+            const userId = $('#editUserId').val();
+            const username = $('#editUsername').val();
+            const email = $('#editEmail').val();
+            const selectedRoles = $('#editRoles').val();
+
+            if (!username || !email) {
+                alert('请填写用户名和邮箱！');
+                return;
+            }
+
+            const userData = {
+                username: username,
+                email: email,
+                roles: selectedRoles ? selectedRoles.map(role => role) : []
+            };
+
+            try {
+                const response = await fetch(`http://localhost:8080/api/admin/users/${userId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(userData)
+                });
+
+                if (response.ok) {
+                    alert('用户信息更新成功！');
+                    $('#editUserModal').modal('hide');
+                    loadAllUsers();
+                } else {
+                    const errorData = await response.json();
+                    alert(`更新失败: ${errorData.message}`);
+                }
+            } catch (error) {
+                console.error('Update error:', error);
+                alert('更新请求失败。');
+            }
+        }
+    });
+</script>
+</body>
+</html>

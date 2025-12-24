@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>众评优选 | 商品管理</title>
+<link href="../libs/bootstrap/5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="../libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet"/>
+<link href="../libs/datatables.net-bs5/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet"/>
+<link href="../libs/datatables.net-responsive-bs5/2.4.1/css/responsive.bootstrap5.min.css" rel="stylesheet"/>
+<link href="../libs/admin-lte/3.2.0/dist/css/adminlte.min.css" rel="stylesheet"/>
+<link href="css/admin.css" rel="stylesheet"/>
+</head>
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+<nav class="main-header navbar navbar-expand navbar-white navbar-light">
+<ul class="navbar-nav"><li class="nav-item"><a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a></li></ul>
+<ul class="navbar-nav ml-auto">
+<li class="nav-item">
+<a class="nav-link" href="/index.html" role="button">
+<i class="fas fa-home mr-1"></i> 返回首页
+</a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="#" id="logoutButton" role="button">
+<i class="fas fa-sign-out-alt"></i> 退出登录
+</a>
+</li>
+</ul>
+</nav>
+<aside class="main-sidebar sidebar-dark-primary elevation-4">
+<a class="brand-link" href="index.html"><img alt="Logo" class="brand-image img-circle elevation-3" src="img/AdminLTELogo.png" style="opacity: .8"/><span class="brand-text font-weight-light">众评优选后台</span></a>
+<div class="sidebar">
+<div class="user-panel mt-3 pb-3 mb-3 d-flex"><div class="info"><a class="d-block" href="#" id="sidebar-username">...</a></div></div>
+<nav class="mt-2">
+<ul class="nav nav-pills nav-sidebar flex-column" data-accordion="false" data-widget="treeview" role="menu">
+<li class="nav-item">
+<a class="nav-link" href="index.html">
+<i class="nav-icon fas fa-tachometer-alt"></i>
+<p>仪表盘</p>
+</a>
+</li>
+<li class="nav-header">内容管理</li>
+<li class="nav-item">
+<a class="nav-link" href="carousels.html">
+<i class="nav-icon fas fa-images"></i>
+<p>轮播图管理</p>
+</a>
+</li>
+<li class="nav-item">
+<a class="nav-link active" href="products.html">
+<i class="nav-icon fas fa-box"></i>
+<p>商品管理</p>
+</a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="reviews.html">
+<i class="nav-icon fas fa-comments"></i>
+<p>评价管理</p>
+</a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="users.html">
+<i class="nav-icon fas fa-users"></i>
+<p>用户管理</p>
+</a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="categories.html">
+<i class="nav-icon fas fa-tags"></i>
+<p>分类管理</p>
+</a>
+</li>
+<li class="nav-item">
+<a class="nav-link" href="merchants.html">
+<i class="nav-icon fas fa-store"></i>
+<p>商家管理</p>
+</a>
+</li>
+</ul>
+</nav>
+</div>
+</aside>
+<div class="content-wrapper">
+<section class="content-header">
+<div class="container-fluid"><div class="row mb-2"><div class="col-sm-6"><h1>商品管理</h1></div></div></div>
+</section>
+<section class="content">
+<div class="container-fluid">
+<div class="card">
+<div class="card-header">
+<h3 class="card-title">商品列表</h3>
+<div class="card-tools">
+<div class="input-group input-group-sm" style="width: 300px;">
+<input class="form-control float-right" id="productSearchInput" placeholder="搜索商品名称" type="text"/>
+<div class="input-group-append">
+<button class="btn btn-default" id="productSearchButton" type="button">
+<i class="fas fa-search"></i>
+</button>
+</div>
+</div>
+</div>
+</div>
+<div class="card-body">
+<div class="row mb-4">
+<div class="col-md-6">
+<div class="form-group">
+<label for="productCategoryFilter">按分类筛选：</label>
+<select class="form-control" id="productCategoryFilter">
+<option value="">全部分类</option>
+</select>
+</div>
+</div>
+</div>
+<button class="btn btn-primary btn-sm mb-3" id="createProductBtn"><i class="fas fa-plus"></i> 创建新商品</button>
+<table class="table table-bordered table-striped" id="productsTable">
+<thead><tr><th>ID</th><th>名称</th><th>分类</th><th>商家</th><th>平均分</th><th>评价数</th><th>操作</th></tr></thead>
+<tbody></tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+</div>
+</div>
+</div>
+<div class="modal fade" id="productModal" role="dialog" tabindex="-1">
+<div class="modal-dialog" role="document">
+<div class="modal-content">
+<form id="productForm">
+<div class="modal-header"><h5 class="modal-title" id="modalTitle">创建商品</h5><button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button></div>
+<div class="modal-body">
+<input id="productId" type="hidden"/>
+<div class="form-group"><label for="name">商品名称</label><input class="form-control" id="name" required="" type="text"/></div>
+<div class="form-group"><label for="description">描述</label><textarea class="form-control" id="description"></textarea></div>
+<div class="form-group"><label for="categoryId">分类</label><select class="form-control" id="categoryId" required=""></select></div>
+<div class="form-group"><label for="merchantId">商家</label><select class="form-control" id="merchantId" required=""></select></div>
+<div class="form-group">
+<label for="productImage">商品图片</label>
+<div class="input-group">
+<div class="custom-file">
+<input accept="image/*" class="custom-file-input" id="productImage" name="image" type="file"/>
+<label class="custom-file-label" for="productImage">选择图片</label>
+</div>
+</div>
+<small class="form-text text-muted">支持JPG、PNG格式，建议尺寸800x800像素</small>
+</div>
+<div class="form-group">
+<label>图片预览</label>
+<div class="mt-3 d-none" id="imagePreviewContainer">
+<div class="mt-2">
+<img alt="商品图片预览" class="img-fluid img-thumbnail" id="imagePreview" src="" style="max-height: 200px; cursor: pointer;"/>
+<small class="form-text text-muted d-block mt-1">点击图片查看大图</small>
+</div>
+</div>
+</div>
+</div>
+<div class="modal-footer"><button class="btn btn-secondary" data-bs-dismiss="modal" type="button">关闭</button><button class="btn btn-primary" type="submit">保存</button></div>
+</form>
+</div>
+</div>
+</div>
+<div class="modal fade" id="imageZoomModal" role="dialog" tabindex="-1">
+<div class="modal-dialog modal-lg" role="document">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title">图片预览</h5>
+<button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+</div>
+<div class="modal-body" style="display: flex; justify-content: center; align-items: center; min-height: 50vh;">
+<img alt="大图预览" class="img-fluid" id="zoomedImage" src=""/>
+</div>
+</div>
+</div>
+</div>
+<script src="../libs/jquery/3.7.1/dist/jquery.min.js"></script>
+<script src="../libs/bootstrap/5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="../libs/datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="../libs/datatables.net-bs5/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<script src="../libs/datatables.net-responsive/2.4.1/js/dataTables.responsive.min.js"></script>
+<script src="../libs/datatables.net-responsive-bs5/2.4.1/js/responsive.bootstrap5.min.js"></script>
+<script src="../libs/admin-lte/3.2.0/dist/js/adminlte.min.js"></script>
+<script>
+    const token = localStorage.getItem('jwtToken');
+    if (!token) {
+        window.location.href = 'login.html';
+    }
+    
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (!user) {
+        window.location.href = 'login.html';
+    }
+
+    if (!user.roles || !user.roles.includes('ROLE_ADMIN')) {
+        alert('您无权访问管理后台！只有管理员可以进入。');
+        setTimeout(() => {
+            window.location.href = '/index.html';
+        }, 500);
+    }
+
+    if (user && user.username) {
+        document.getElementById('sidebar-username').textContent = user.username;
+    }
+
+    document.getElementById('imagePreview').addEventListener('click', function() {
+        if (this.src) {
+            const zoomedImage = document.getElementById('zoomedImage');
+            zoomedImage.src = this.src;
+            
+            const imageZoomModal = new bootstrap.Modal(document.getElementById('imageZoomModal'));
+            imageZoomModal.show();
+        }
+    });
+    
+    document.getElementById('logoutButton').addEventListener('click', () => {
+        localStorage.clear();
+        window.location.href = 'login.html';
+    });
+
+    function handleAuthError(response) {
+        if (response.status === 401 || response.status === 403) {
+            console.error('认证失败，重定向到登录页');
+            localStorage.clear();
+            window.location.href = 'login.html';
+            return true;
+        }
+        return false;
+    }
+
+    const API_URL = 'http://localhost:8080/api/admin/products';
+    const HEADERS = { 'Authorization': `Bearer ${token}` };
+
+    let productSearchTerm = '';
+    let selectedCategoryId = '';
+
+    let categories = [];
+    let merchants = [];
+    let allProducts = [];
+
+    async function loadProductData() {
+        try {
+            let queryParams = '?size=1000';
+
+            const response = await fetch(`${API_URL}${queryParams}`, {
+                method: 'GET',
+                headers: HEADERS
+            });
+
+            if (handleAuthError(response)) {
+                return;
+            }
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            allProducts = data.content || data;
+
+            console.log('加载的所有商品数据:', allProducts);
+            if (allProducts && allProducts.length > 0) {
+                console.log('商品分类详情:');
+                allProducts.forEach(product => {
+                    console.log(`ID: ${product.id}, 名称: ${product.name}, categoryId: ${product.categoryId}, categoryName: ${product.categoryName}`);
+                });
+            }
+
+            filterAndRenderProducts();
+        } catch (error) {
+            console.error('加载商品数据失败:', error);
+            showNotification('error', '数据加载失败，请稍后重试');
+
+            const tableBody = document.querySelector('#productsTable tbody');
+            tableBody.innerHTML = '<tr><td colspan="7" class="text-center text-danger">数据加载失败，请稍后重试</td></tr>';
+        }
+    }
+
+    function filterAndRenderProducts() {
+        const tableBody = document.querySelector('#productsTable tbody');
+        tableBody.innerHTML = '';
+
+        let filteredProducts = allProducts.filter(product => {
+            const productCategoryId = product.categoryId;
+            const productCategoryName = product.categoryName;
+            const filterCategoryId = selectedCategoryId;
+            console.log(`商品ID: ${product.id}, 商品分类ID: ${productCategoryId}, 商品分类名称: ${productCategoryName}, 筛选分类ID: ${filterCategoryId}`);
+
+            let categoryMatch = false;
+
+            if (!selectedCategoryId || selectedCategoryId === '') {
+                categoryMatch = true;
+            } else if (product) {
+                if (product.categoryId !== undefined) {
+                    const productCat = String(product.categoryId);
+                    const filterCat = String(selectedCategoryId);
+
+                    categoryMatch = productCat === filterCat;
+
+                    if (!categoryMatch) {
+                        const productCatNum = parseFloat(productCat);
+                        const filterCatNum = parseFloat(filterCat);
+                        if (!isNaN(productCatNum) && !isNaN(filterCatNum)) {
+                            categoryMatch = productCatNum === filterCatNum;
+                        }
+                    }
+                }
+
+                if (!categoryMatch && product.categoryName && selectedCategoryId) {
+                    const selectedCategory = categories.find(cat => String(cat.id) === String(selectedCategoryId));
+                    if (selectedCategory && product.categoryName === selectedCategory.name) {
+                        categoryMatch = true;
+                        console.log(`通过名称匹配成功: 商品分类名称=${product.categoryName}, 选择的分类名称=${selectedCategory.name}`);
+                    }
+                }
+            }
+            
+            console.log(`比较结果: ${categoryMatch}`);
+
+            const searchMatch = !productSearchTerm || 
+                               (product.name && product.name.toLowerCase().includes(productSearchTerm.toLowerCase()));
+            
+            return categoryMatch && searchMatch;
+        });
+        
+        console.log(`筛选后商品数量: ${filteredProducts.length}`);
+
+        if (!filteredProducts || filteredProducts.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="7" class="text-center">暂无匹配数据</td></tr>';
+            return;
+        }
+        
+        try {
+            filteredProducts.forEach(product => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${product.id}</td>
+                    <td>${product.name}</td>
+                    <td>${product.categoryName || '-'}</td>
+                    <td>${product.merchantName || '-'}</td>
+                    <td>${product.averageRating !== undefined ? product.averageRating.toFixed(1) : '0.0'}</td>
+                    <td>${product.reviewCount || 0}</td>
+                    <td>
+                        <button class="btn btn-info btn-sm edit-btn" data-id="${product.id}"><i class="fas fa-edit"></i></button>
+                        <button class="btn btn-danger btn-sm delete-btn" data-id="${product.id}" data-name="${product.name}"><i class="fas fa-trash"></i></button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+
+            bindTableEvents();
+        } catch (error) {
+            console.error('渲染商品数据失败:', error);
+            showNotification('error', '数据显示失败，请稍后重试');
+
+            tableBody.innerHTML = '<tr><td colspan="7" class="text-center text-danger">数据显示失败，请稍后重试</td></tr>';
+        }
+    }
+
+    function bindTableEvents() {
+        document.querySelectorAll('.edit-btn').forEach(btn => {
+            btn.addEventListener('click', async function() {
+                const id = this.getAttribute('data-id');
+
+                if (categories.length === 0 || merchants.length === 0) {
+                    await initData();
+                }
+                
+                try {
+                    console.log(`正在请求商品详情: ${API_URL}/${id}`);
+                    const response = await fetch(`${API_URL}/${id}`, { headers: HEADERS });
+
+                    if (handleAuthError(response)) {
+                        return;
+                    }
+                    
+                    if (response.ok) {
+                        const product = await response.json();
+                        console.log('获取到的商品详情:', product);
+                        
+                        $('#productForm')[0].reset();
+                        populateSelect('categoryId', categories);
+                        populateSelect('merchantId', merchants);
+                        
+                        $('#modalTitle').text('编辑商品');
+                        $('#productId').val(product.id);
+                        $('#name').val(product.name);
+                        $('#description').val(product.description || '');
+                        $('#imagePreviewContainer').addClass('d-none');
+                        $('#productImage').val('');
+                        $('#existingImageUrl').remove();
+
+                        if (product.imageUrls) {
+                            console.log('设置图片预览URL:', product.imageUrls);
+                            document.getElementById('imagePreviewContainer').classList.remove('d-none');
+                            document.getElementById('imagePreview').src = product.imageUrls;
+                            $('<input>').attr({
+                                type: 'hidden',
+                                id: 'existingImageUrl',
+                                name: 'existingImageUrl',
+                                value: product.imageUrls
+                            }).appendTo('#productForm');
+                        } else {
+                            console.log('没有图片URL，隐藏预览');
+                        }
+
+                        const categoryMatch = categories.find(cat => cat.name === product.categoryName);
+                        const merchantMatch = merchants.find(mer => mer.name === product.merchantName);
+                        $('#categoryId').val(categoryMatch ? categoryMatch.id : '');
+                        $('#merchantId').val(merchantMatch ? merchantMatch.id : '');
+
+                        const modalElement = document.getElementById('productModal');
+                        const productModal = new bootstrap.Modal(modalElement);
+                        productModal.show();
+                    } else {
+                        console.error(`API请求失败: ${response.status} ${response.statusText}`);
+                        const errorText = await response.text();
+                        console.error('错误响应:', errorText);
+                        showNotification('error', `获取商品详情失败: ${response.status}`);
+                    }
+                } catch (error) {
+                    console.error('获取商品详情失败:', error);
+                    showNotification('error', '获取商品详情失败');
+                }
+            });
+        });
+
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', async function() {
+                const id = this.getAttribute('data-id');
+                const name = this.getAttribute('data-name');
+                
+                if (confirm(`确定删除商品 "${name}"?`)) {
+                    try {
+                        const response = await fetch(`${API_URL}/${id}`, {
+                        method: 'DELETE',
+                        headers: HEADERS
+                    });
+
+                    if (handleAuthError(response)) {
+                        return;
+                    }
+                    
+                    if (response.ok) {
+                        loadProductData();
+                        showNotification('success', '商品删除成功！');
+                    } else {
+                        const errorData = await response.json();
+                        showNotification('error', errorData.message || '删除失败');
+                    }
+                    } catch (error) {
+                        console.error('删除失败:', error);
+                        showNotification('error', '网络错误，请稍后重试');
+                    }
+                }
+            });
+        });
+    }
+    
+
+
+    function populateCategoryFilter(categoryList) {
+        const select = document.getElementById('productCategoryFilter');
+        while (select.options.length > 1) {
+            select.remove(1);
+        }
+
+        categoryList.forEach(category => {
+            const option = document.createElement('option');
+            option.value = category.id;
+            option.textContent = category.name;
+            select.appendChild(option);
+        });
+    }
+    
+    function populateSelect(selectId, items) {
+        const select = document.getElementById(selectId);
+        select.innerHTML = '<option value="">请选择...</option>';
+
+        if (Array.isArray(items)) {
+            items.forEach(item => {
+                if (item && item.id && item.name) {
+                    select.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+                }
+            });
+        } else {
+            console.error('populateSelect: items参数不是数组', items);
+        }
+    }
+
+    $('#productImage').on('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+                const imagePreview = document.getElementById('imagePreview');
+                
+                imagePreview.src = event.target.result;
+                imagePreviewContainer.classList.remove('d-none');
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const createBtn = document.getElementById('createProductBtn');
+        if (createBtn) {
+            createBtn.addEventListener('click', async function() {
+                try {
+                    console.log('创建商品按钮被点击');
+                    if (categories.length === 0 || merchants.length === 0) {
+                        console.log('正在加载分类和商家数据...');
+                        await initData();
+                        console.log('数据加载完成');
+                    }
+
+                    $('#productForm')[0].reset();
+                    $('#productId').val('');
+                    $('#modalTitle').text('创建新商品');
+                    populateSelect('categoryId', categories);
+                    populateSelect('merchantId', merchants);
+                    
+                    console.log('准备显示模态框');
+                    const modalElement = document.getElementById('productModal');
+                    const productModal = new bootstrap.Modal(modalElement);
+                    productModal.show();
+                    console.log('模态框已显示');
+                } catch (error) {
+                    console.error('创建商品按钮点击事件出错:', error);
+                    showNotification('error', '打开创建窗口失败，请稍后重试');
+                }
+            });
+        } else {
+            console.error('未找到创建商品按钮');
+        }
+    });
+
+    $('#productForm').on('submit', async function(e) {
+        e.preventDefault();
+        const id = $('#productId').val();
+        const method = id ? 'PUT' : 'POST';
+        const url = id ? `${API_URL}/${id}` : API_URL;
+
+        const name = $('#name').val();
+        const categoryId = $('#categoryId').val();
+        const merchantId = $('#merchantId').val();
+        
+        if (!name || !categoryId || !merchantId) {
+            showNotification('error', '请填写所有必填字段');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('name', name);
+        formData.append('description', $('#description').val());
+        formData.append('categoryId', categoryId);
+        formData.append('merchantId', merchantId);
+
+        const imageFile = $('#productImage')[0].files[0];
+        if (imageFile) {
+            formData.append('imageFile', imageFile);
+        } else if (id) {
+            const existingImageUrl = $('#existingImageUrl').val();
+            if (existingImageUrl) {
+                formData.append('existingImageUrl', existingImageUrl);
+            }
+        }
+
+        try {
+            const response = await fetch(url, { 
+                method, 
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }, 
+                body: formData 
+            });
+
+            if (handleAuthError(response)) {
+                return;
+            }
+            
+            if(response.ok) {
+                    const productModal = bootstrap.Modal.getInstance(document.getElementById('productModal'));
+                    productModal.hide();
+                    
+                    loadProductData();
+                    showNotification('success', id ? '商品更新成功！' : '商品创建成功！');
+            } else {
+                const errorData = await response.json();
+                showNotification('error', errorData.message || '操作失败');
+            }
+        } catch (error) {
+            console.error('操作失败:', error);
+            showNotification('error', '网络错误，请稍后重试');
+        }
+    });
+
+    function showNotification(type, message) {
+        const notification = document.createElement('div');
+        notification.className = `position-fixed top-5 right-5 p-3 rounded shadow-lg z-50 transition-all duration-300 ${type === 'success' ? 'bg-success text-white' : 'bg-danger text-white'}`;
+        notification.innerText = message;
+
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+            notification.style.opacity = '0';
+            setTimeout(() => {
+                document.body.removeChild(notification);
+            }, 300);
+        }, 3000);
+    }
+
+    document.getElementById('productSearchButton').addEventListener('click', () => {
+        productSearchTerm = document.getElementById('productSearchInput').value.trim();
+        filterAndRenderProducts();
+    });
+
+    document.getElementById('productSearchInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            productSearchTerm = e.target.value.trim();
+            filterAndRenderProducts();
+        }
+    });
+
+    document.getElementById('productCategoryFilter').addEventListener('change', (e) => {
+        selectedCategoryId = e.target.value;
+        console.log('选择的分类ID:', selectedCategoryId);
+        filterAndRenderProducts();
+    });
+
+    async function initData() {
+        try {
+            const categoriesResponse = await fetch('http://localhost:8080/api/categories?page=0&size=1000', { headers: HEADERS });
+
+            if (handleAuthError(categoriesResponse)) {
+                return;
+            }
+            
+            if (categoriesResponse.ok) {
+                const categoriesData = await categoriesResponse.json();
+                categories = categoriesData.content || categoriesData;
+                console.log('加载的分类数据:', categories);
+                console.log('分类ID和名称对应关系:');
+                categories.forEach(category => {
+                    console.log(`ID: ${category.id}, 名称: ${category.name}`);
+                });
+                populateCategoryFilter(categories);
+            }
+
+            const merchantsResponse = await fetch('http://localhost:8080/api/merchants?page=0&size=1000', { headers: HEADERS });
+
+            if (handleAuthError(merchantsResponse)) {
+                return;
+            }
+            
+            if (merchantsResponse.ok) {
+                const merchantsData = await merchantsResponse.json();
+                merchants = merchantsData.content || merchantsData;
+                console.log('加载的商家数据:', merchants);
+                console.log('商家ID和名称对应关系:');
+                merchants.forEach(merchant => {
+                    console.log(`ID: ${merchant.id}, 名称: ${merchant.name}`);
+                });
+            } else {
+                console.error('获取商家数据失败:', merchantsResponse.status, merchantsResponse.statusText);
+            }
+
+            loadProductData();
+        } catch (error) {
+            console.error('初始化数据失败:', error);
+        }
+    }
+
+    if (typeof initData === 'function') {
+        initData();
+    } else {
+        console.error('初始化函数不存在');
+    }
+</script>
+</body>
+</html>

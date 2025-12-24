@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>众评优选 - 发现和选择优质商品</title>
+<link href="libs/bootstrap/5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+<link href="css/style.css" rel="stylesheet"/>
+</link></head>
+<body>
+<header>
+<nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+<div class="container">
+<a class="navbar-brand fw-bold" href="index.html">
+<i class="fa-solid fa-star-half-stroke"></i>
+                众评优选
+            </a>
+<button aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-bs-target="#navbarNav" data-bs-toggle="collapse" type="button">
+<span class="navbar-toggler-icon"></span>
+</button>
+<div class="collapse navbar-collapse" id="navbarNav">
+<div class="d-none d-lg-flex flex-grow-1 mx-4">
+<ul class="navbar-nav me-auto">
+<li class="nav-item dropdown">
+<a aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" id="categoryDropdown" role="button">
+<i class="fa-solid fa-th-large"></i> 全部分类
+                            </a>
+<ul aria-labelledby="categoryDropdown" class="dropdown-menu">
+<li><a class="dropdown-item" href="/product/list.html?categoryId=1">电子产品</a></li>
+<li><a class="dropdown-item" href="/product/list.html?categoryId=2">家居生活</a></li>
+<li><a class="dropdown-item" href="/product/list.html?categoryId=3">美妆个护</a></li>
+<li><a class="dropdown-item" href="/product/list.html?categoryId=4">食品饮料</a></li>
+<li><a class="dropdown-item" href="/product/list.html?categoryId=5">服饰鞋包</a></li>
+</ul>
+</li>
+<li class="nav-item"><a class="nav-link" href="/product/list.html?sort=createdAt,desc">最新上架</a></li>
+<li class="nav-item"><a class="nav-link" href="/product/list.html?sort=reviewCount,desc">评价最多</a></li>
+<li class="nav-item"><a class="nav-link" href="/product/list.html?sort=averageRating,desc">评分最高</a></li>
+</ul>
+</div>
+<form class="d-flex mx-auto my-2 my-lg-0" id="search-form">
+<input aria-label="Search" class="form-control me-2" placeholder="搜索商品、评价..." style="width: 300px;" type="search"/>
+<button class="btn btn-outline-primary" type="submit">
+<i class="fa-solid fa-magnifying-glass"></i>
+</button>
+</form>
+<ul class="navbar-nav ms-auto" id="auth-links">
+<li class="nav-item" id="login-link">
+<a class="btn btn-outline-primary me-2" href="/user/login.html">登录</a>
+</li>
+<li class="nav-item" id="register-link">
+<a class="btn btn-primary" href="/user/register.html">注册</a>
+</li>
+<li class="nav-item dropdown d-none" id="user-profile-link">
+<a aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" id="navbarDropdown" role="button">
+<i class="fa-solid fa-user"></i> 个人中心
+                        </a>
+<ul aria-labelledby="navbarDropdown" class="dropdown-menu">
+<li><a class="dropdown-item" href="/user/profile.html">我的信息</a></li>
+<li><a class="dropdown-item" href="/user/favorites.html">我的收藏</a></li>
+<li><hr class="dropdown-divider"/></li>
+<li><a class="dropdown-item d-none" href="/admin/index.html" id="admin-dashboard-link">管理员后台</a></li>
+<li><a class="dropdown-item d-none" href="/merchant/dashboard.html" id="merchant-dashboard-link">商家后台</a></li>
+<li><hr class="dropdown-divider"/></li>
+<li><button class="dropdown-item" id="logout-button">退出登录</button></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</nav>
+</header>
+<main class="container my-4">
+<section class="mb-5" id="carousel-section">
+<div class="carousel slide" data-bs-ride="carousel" id="mainCarousel">
+<div class="carousel-indicators" id="carousel-indicators-container">
+</div>
+<div class="carousel-inner" id="carousel-inner-container">
+<div class="carousel-item active">
+<img alt="加载中" class="d-block w-100" src="https://via.placeholder.com/1200x400.png?text=Loading..."/>
+</div>
+</div>
+<button class="carousel-control-prev" data-bs-slide="prev" data-bs-target="#mainCarousel" type="button">
+<span aria-hidden="true" class="carousel-control-prev-icon"></span>
+<span class="visually-hidden">Previous</span>
+</button>
+<button class="carousel-control-next" data-bs-slide="next" data-bs-target="#mainCarousel" type="button">
+<span aria-hidden="true" class="carousel-control-next-icon"></span>
+<span class="visually-hidden">Next</span>
+</button>
+</div>
+</section>
+
+<section class="mb-5 bg-light p-5 rounded shadow-sm">
+    <h2 class="text-center mb-4">按地区查找附近好物</h2>
+    <div class="row g-3 max-w-4xl mx-auto">
+        <div class="col-md-4">
+            <label for="home-regionProvince" class="form-label">省份</label>
+            <select class="form-control" id="home-regionProvince"></select>
+        </div>
+        <div class="col-md-4">
+            <label for="home-regionCity" class="form-label">城市</label>
+            <select class="form-control" id="home-regionCity"></select>
+        </div>
+        <div class="col-md-4">
+            <label for="home-regionArea" class="form-label">区县</label>
+            <select class="form-control" id="home-regionArea"></select>
+        </div>
+    </div>
+    <div class="text-center mt-4">
+        <button id="home-findByRegionBtn" class="btn btn-primary px-6">查找商品</button>
+    </div>
+</section>
+
+<section class="mb-5" id="top-rated-section">
+<h2 class="section-title text-center mb-4">
+<i class="fa-solid fa-trophy text-warning"></i> 高评分榜单
+        </h2>
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4" id="top-rated-products-container">
+<div class="col"><div class="card h-100"><div class="card-body text-center">加载中...</div></div></div>
+<div class="col"><div class="card h-100"><div class="card-body text-center">加载中...</div></div></div>
+<div class="col"><div class="card h-100"><div class="card-body text-center">加载中...</div></div></div>
+<div class="col"><div class="card h-100"><div class="card-body text-center">加载中...</div></div></div>
+</div>
+</section>
+<section id="hot-reviews-section">
+<h2 class="section-title text-center mb-4">
+<i class="fa-solid fa-fire text-danger"></i> 热门评价
+        </h2>
+<div class="list-group" id="hot-reviews-container">
+<a class="list-group-item list-group-item-action d-flex gap-3 py-3" href="#">
+<div class="d-flex gap-2 w-100 justify-content-between">
+<div>
+<h6 class="mb-0">加载中...</h6>
+<p class="mb-0 opacity-75">正在从服务器获取热门评价...</p>
+</div>
+</div>
+</a>
+</div>
+</section>
+</main>
+
+<script src="libs/bootstrap/5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/placeholder-utils.js"></script>
+<script src="js/main.js"></script>
+<script src="js/interaction.js"></script>
+<script src="js/region-selector.js"></script>
+<script>
+        async function loadCategories() {
+            try {
+                const response = await fetch('http://localhost:8080/api/categories');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const categories = await response.json();
+
+                const categoryDropdown = document.querySelector('#categoryDropdown + .dropdown-menu');
+                if (categoryDropdown && categories.length > 0) {
+                    categoryDropdown.innerHTML = '';
+                    
+                    categories.forEach(category => {
+                        const listItem = document.createElement('li');
+                        listItem.innerHTML = `
+                            <a class="dropdown-item" href="/product/list.html?categoryId=${category.id}">
+                                ${category.name}
+                            </a>
+                        `;
+                        categoryDropdown.appendChild(listItem);
+                    });
+                }
+            } catch (error) {
+                console.error('加载分类数据失败:', error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadCategories);
+    </script>
+<script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const searchForm = document.getElementById('search-form');
+            if (searchForm) {
+                searchForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const searchInput = searchForm.querySelector('input');
+                    const searchQuery = searchInput.value.trim();
+                    if (searchQuery) {
+                        window.location.href = `/product/list.html?searchQuery=${encodeURIComponent(searchQuery)}`;
+                    }
+                });
+            }
+
+            if (defaultRegionSelector) {
+                try {
+                    await defaultRegionSelector.init('#home-regionProvince', '#home-regionCity', '#home-regionArea');
+                } catch (error) {
+                    console.error('初始化首页地区选择器失败:', error);
+                }
+            }
+
+            const filterBtn = document.getElementById('home-findByRegionBtn');
+            if (filterBtn) {
+                filterBtn.addEventListener('click', () => {
+                    if (defaultRegionSelector) {
+                        const regions = defaultRegionSelector.getSelectedRegions('#home-regionProvince', '#home-regionCity', '#home-regionArea');
+                        const params = new URLSearchParams();
+                        
+                        if (regions.province) {
+                            params.set('province', regions.province);
+                            if (regions.city) {
+                                params.set('city', regions.city);
+                                if (regions.area) {
+                                    params.set('area', regions.area);
+                                }
+                            }
+                        }
+                        
+                        window.location.href = `/product/list.html?${params.toString()}`;
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
